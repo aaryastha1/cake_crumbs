@@ -3,41 +3,35 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const safeParse = (value) => {
-    try {
-      return value ? JSON.parse(value) : null;
-    } catch (e) {
-      console.error("Error parsing JSON:", e);
-      return null;
-    }
-  };
-
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [user, setUser] = useState(() =>
-    safeParse(localStorage.getItem("user"))
-  );
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    if (token) {
-      const storedUser = safeParse(localStorage.getItem("user"));
-      setUser(storedUser);
-    } else {
-      setUser(null);
+    try {
+      const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+      const savedToken = localStorage.getItem("token") || null;
+      if (savedUser) setUser(savedUser);
+      if (savedToken) setToken(savedToken);
+    } catch (err) {
+      console.error("Failed to parse localStorage user:", err);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
-  }, [token]);
+  }, []);
 
-  const login = (userData, jwt) => {
+  const login = (userData, tokenData) => {
     setUser(userData);
-    setToken(jwt);
-    localStorage.setItem("token", jwt);
+    setToken(tokenData);
     localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", tokenData);
   };
 
   const logout = () => {
     setUser(null);
-    setToken("");
-    localStorage.removeItem("token");
+    setToken(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.href = "/";
   };
 
   return (

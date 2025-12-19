@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import useAuth from "../hooks/useAuth"; // For auth info
 
 // --- Design Constants ---
 const primaryPink = "#ff4c8a"; // Button pink
@@ -41,6 +42,7 @@ const bestSellerCardStyle = {
 };
 
 export default function Home() {
+  const { user } = useAuth(); // Get logged-in user info
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0); // For hero carousel
@@ -55,7 +57,7 @@ export default function Home() {
       .catch(() => setLoading(false));
   }, []);
 
-  // Automatic hero carousel (slower)
+  // Automatic hero carousel
   useEffect(() => {
     if (!homeData) return;
 
@@ -65,7 +67,7 @@ export default function Home() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 4000); // Slide changes every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [homeData]);
@@ -84,7 +86,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* Pass user to Header so it can show profile icon */}
+      <Header user={user} />
 
       <main className="flex-grow relative" style={mainContentStyle}>
         {/* HERO SECTION */}
@@ -98,7 +101,7 @@ export default function Home() {
                 className="rounded-2xl shadow-xl w-full max-w-lg mx-auto object-cover h-[400px] md:h-[450px]"
               />
 
-              {/* Carousel indicators (small circles) */}
+              {/* Carousel indicators */}
               <div className="flex justify-center mt-6 space-x-2">
                 {heroImages.map((_, index) => (
                   <button
@@ -109,7 +112,7 @@ export default function Home() {
                         ? "bg-pink-500"
                         : "bg-gray-300 hover:bg-pink-300"
                     }`}
-                  ></button>
+                  />
                 ))}
               </div>
             </div>
@@ -197,27 +200,22 @@ export default function Home() {
         </section>
 
         {/* CUSTOM ORDER SECTION */}
-        <section
-          className="py-10"
-          style={{ backgroundColor: bestSellersBgColor }}
-        >
+        <section className="py-10" style={{ backgroundColor: bestSellersBgColor }}>
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-start justify-between">
             {/* TEXT */}
-          <div className="md:w-1/2 mb-6 md:mb-0 text-left md:pr-16 md:ml-8mt-4">
-
-          <h2
-            className="mb-6"
-            style={{
-              color: secondaryPink,
-              fontFamily: "'Great Vibes', cursive", // SAME as hero
-              fontWeight: "700",
-              fontSize: "3rem",
-              lineHeight: "1.1",
-            }}
-          >
-            Special Orders
-          </h2>
-
+            <div className="md:w-1/2 mb-6 md:mb-0 text-left md:pr-16 md:ml-8mt-4">
+              <h2
+                className="mb-6"
+                style={{
+                  color: secondaryPink,
+                  fontFamily: "'Great Vibes', cursive",
+                  fontWeight: "700",
+                  fontSize: "3rem",
+                  lineHeight: "1.1",
+                }}
+              >
+                Special Orders
+              </h2>
 
               <p
                 className="text-lg mb-10 leading-relaxed"

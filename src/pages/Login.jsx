@@ -22,7 +22,7 @@ const Login = () => {
       const res = await loginUser(formData);
       login(res.data.user, res.data.token);
       alert("Login successful!");
-      navigate("/");
+      navigate("/home"); // Navigate to home page
     } catch (err) {
       console.error(err.response?.data || err.message);
       alert(
@@ -81,7 +81,6 @@ const Login = () => {
             <h2 className="text-2xl font-bold mb-1" style={{ color: secondaryPink }}>
               Login now
             </h2>
-            {/* <p className="text-sm text-gray-500">Welcome back! Please login.</p> */}
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">

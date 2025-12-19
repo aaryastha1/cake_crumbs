@@ -1,16 +1,128 @@
+// import React from "react";
+// import { Routes, Route } from "react-router-dom";
+
+// // Auth pages
+// import Register from "../pages/Register";
+// import Login from "../pages/Login";
+// import Home from "../pages/Home";
+
+// // Admin pages
+// import CakePreviewPage from "../pages/admin/cakepreview";
+// import AdminDashboard from "../pages/admin/adminDashboard";
+// import AdminCustomizes from "../pages/admin/adminCustomize";
+// import AdminCategories from "../pages/admin/adminCategories";
+// import CreateCategory from "../pages/admin/addCategory";
+// import AdminProducts from "../pages/admin/adminProduct";
+// import AddProduct from "../pages/admin/addproduct";
+// import ViewProduct from "../pages/admin/adminviewproduct";
+// import EditProduct from "../pages/admin/admineditProduct";
+
+// // Frontend (user) pages
+// import OccasionProducts from "../pages/OccasionProducts";
+// import CakeDetails from "../pages/CakeDetails"; // ✅ new
+// import AboutUs from "../pages/aboutUs"; 
+
+// // Admin layout
+// import AdminLayout from "../layouts/adminLayout";
+
+// export default function AppRoutes() {
+//   return (
+//     <Routes>
+//       {/* Auth */}
+//       <Route path="/register" element={<Register />} />
+//       <Route path="/login" element={<Login />} />
+
+//       {/* Admin Routes (WITH SIDEBAR) */}
+//       <Route path="/admin" element={<AdminLayout />}>
+//         <Route path="dashboard" element={<AdminDashboard />} />
+//         <Route path="preview-cake" element={<CakePreviewPage />} />
+//         <Route path="customizes" element={<AdminCustomizes />} />
+//         <Route path="categories" element={<AdminCategories />} />
+//         <Route path="categories/add" element={<CreateCategory />} />
+//         <Route path="products" element={<AdminProducts />} />
+//         <Route path="products/add" element={<AddProduct />} />
+//         <Route path="products/view/:id" element={<ViewProduct />} />
+//         <Route path="products/edit/:id" element={<EditProduct />} />
+//       </Route>
+
+//       {/* User Frontend Routes */}
+//       <Route path="/occasions/:occasionId" element={<OccasionProducts />} />
+//       <Route path="/products/:productId" element={<CakeDetails />} /> {/* ✅ new */}
+
+
+//         <Route path="/about-us" element={<AboutUs />} />
+
+//       {/* Home / fallback */}
+//       <Route path="*" element={<Home />} />
+//     </Routes>
+//   );
+// }
+
+
+
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+
+// Auth pages
 import Register from "../pages/Register";
 import Login from "../pages/Login";
-import Home from "../pages/Home"
+import Home from "../pages/Home";
+
+// Admin pages
+import CakePreviewPage from "../pages/admin/cakepreview";
+import AdminDashboard from "../pages/admin/adminDashboard";
+import AdminCustomizes from "../pages/admin/adminCustomize";
+import AdminCategories from "../pages/admin/adminCategories";
+import CreateCategory from "../pages/admin/addCategory";
+import AdminProducts from "../pages/admin/adminProduct";
+import AddProduct from "../pages/admin/addproduct";
+import ViewProduct from "../pages/admin/adminviewproduct";
+import EditProduct from "../pages/admin/admineditProduct";
+import AdminOrders from "../pages/admin/adminOrder"; // ✅ new Admin page
+
+// Frontend (user) pages
+import OccasionProducts from "../pages/OccasionProducts";
+import CakeDetails from "../pages/CakeDetails"; 
+import AboutUs from "../pages/aboutUs"; 
+import UserCustomizes from "../pages/Customizecake"; 
+// ✅ new user page
+
+// Admin layout
+import AdminLayout from "../layouts/adminLayout";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Auth */}
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
-      <Route path="*" element={<Home/>} />
 
+      {/* Admin Routes (WITH SIDEBAR) */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="preview-cake" element={<CakePreviewPage />} />
+        <Route path="customizes" element={<AdminCustomizes />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="categories/add" element={<CreateCategory />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="products/add" element={<AddProduct />} />
+        <Route path="products/view/:id" element={<ViewProduct />} />
+        <Route path="products/edit/:id" element={<EditProduct />} />
+        <Route path="orders" element={<AdminOrders />} /> {/* ✅ Admin Orders page */}
+      </Route>
+
+      {/* User Frontend Routes */}
+      <Route path="/occasions/:occasionId" element={<OccasionProducts />} />
+      <Route path="/products/:productId" element={<CakeDetails />} /> 
+      <Route path="/customize" element={<AdminCustomizes />} /> {/* ✅ User Customize Cake page */}
+      <Route path="/about-us" element={<AboutUs />} />
+
+
+         <Route path="/customize-cake" element={<UserCustomizes />} />
+
+      {/* Home / fallback */}
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 }
