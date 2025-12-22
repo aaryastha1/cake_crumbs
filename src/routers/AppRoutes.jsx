@@ -80,12 +80,14 @@ import AddProduct from "../pages/admin/addproduct";
 import ViewProduct from "../pages/admin/adminviewproduct";
 import EditProduct from "../pages/admin/admineditProduct";
 import AdminOrders from "../pages/admin/adminOrder"; // ✅ new Admin page
+import AdminBakery from "../pages/admin/adminBakery";
 
 // Frontend (user) pages
 import OccasionProducts from "../pages/OccasionProducts";
-import CakeDetails from "../pages/CakeDetails"; 
-import AboutUs from "../pages/aboutUs"; 
-import UserCustomizes from "../pages/Customizecake"; 
+import CakeDetails from "../pages/CakeDetails";
+import AboutUs from "../pages/aboutUs";
+import UserCustomizes from "../pages/Customizecake";
+import BakeryProducts from "../pages/bakeries";
 // ✅ new user page
 
 // Admin layout
@@ -110,16 +112,23 @@ export default function AppRoutes() {
         <Route path="products/view/:id" element={<ViewProduct />} />
         <Route path="products/edit/:id" element={<EditProduct />} />
         <Route path="orders" element={<AdminOrders />} /> {/* ✅ Admin Orders page */}
+        <Route path="bakery" element={<AdminBakery />} />
+
       </Route>
 
       {/* User Frontend Routes */}
       <Route path="/occasions/:occasionId" element={<OccasionProducts />} />
-      <Route path="/products/:productId" element={<CakeDetails />} /> 
+      <Route path="/products/:productId" element={<CakeDetails />} />
       <Route path="/customize" element={<AdminCustomizes />} /> {/* ✅ User Customize Cake page */}
       <Route path="/about-us" element={<AboutUs />} />
 
 
-         <Route path="/customize-cake" element={<UserCustomizes />} />
+      <Route path="/customize-cake" element={<UserCustomizes />} />
+
+     <Route path="/bakeries" element={<BakeryProducts />} />             {/* All bakeries */}
+<Route path="/bakeries/:categoryId" element={<BakeryProducts />} /> {/* Filtered by category */}
+
+
 
       {/* Home / fallback */}
       <Route path="*" element={<Home />} />

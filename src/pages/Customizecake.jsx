@@ -1,215 +1,206 @@
-// UserCustomize.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Check, ShoppingBag, ArrowLeft, Users } from "lucide-react";
 
 const UserCustomize = () => {
   const [customizations, setCustomizations] = useState([]);
   const [selectedCake, setSelectedCake] = useState(null);
   const [userChoice, setUserChoice] = useState({
-    color: "Pink",
-    size: "2 Pounds",
-    flavor: "Vanilla",
-    price: 20, // default price
+    color: "",
+    size: "",
+    flavor: "",
+    price: 0,
+    colorImage: "",
   });
 
   useEffect(() => {
-    const fetchCustomizations = async () => {
+    const fetchCakes = async () => {
       try {
-        const res = await axios.get("http://localhost:5006/api/customOrders");
+        const res = await axios.get("http://localhost:5006/api/admin/custom-cakes");
         setCustomizations(res.data);
       } catch (err) {
         console.error("Error fetching cakes:", err);
       }
     };
-    fetchCustomizations();
+    fetchCakes();
   }, []);
 
   const handleCakeSelect = (cake) => {
     setSelectedCake(cake);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // Reset default selection
-    setUserChoice({ color: "Pink", size: "2 Pounds", flavor: "Vanilla", price: 20 });
+    setUserChoice({ color: "", size: "", flavor: "", price: 0, colorImage: cake.image });
   };
 
-  const handleChange = (key, value, price = null) => {
-    const newChoice = { ...userChoice, [key]: value };
-    if (price) newChoice.price = price;
-    setUserChoice(newChoice);
+  const handleChange = (key, value) => {
+    if (key === "size") {
+      const weight = parseInt(value) || 1;
+      setUserChoice(prev => ({ ...prev, size: value, price: selectedCake.basePrice * weight }));
+    } else if (key === "color") {
+      const colorObj = selectedCake.colorImages?.find(ci => ci.color.name === value);
+      setUserChoice(prev => ({ ...prev, color: value, colorImage: colorObj?.image || selectedCake.image }));
+    } else {
+      setUserChoice(prev => ({ ...prev, [key]: value }));
+    }
   };
+
+  if (!selectedCake) {
+    return (
+      <div className="bg-[#FAF7F6] min-h-screen">
+        <Header />
+        <main className="max-w-7xl mx-auto px-6 py-12">
+          <h1 className="text-2xl font-serif text-gray-800 text-center mb-8">Choose Your Base Style</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {customizations.map(cake => (
+              <div key={cake._id} onClick={() => handleCakeSelect(cake)} className="bg-white rounded-[28px] p-3 shadow-sm hover:shadow-lg transition-all cursor-pointer border border-transparent hover:border-rose-100 group">
+                <img src={`http://localhost:5006${cake.image}`} className="w-full h-56 object-cover rounded-[20px] mb-3 group-hover:scale-[1.02] transition-transform" alt="" />
+                <h3 className="font-bold text-gray-800 text-md ml-2">{cake.name}</h3>
+                <p className="text-rose-500 font-medium text-sm ml-2">From Rs {cake.basePrice}</p>
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div style={{ backgroundColor: "#fdfdfd", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
+    <div className="bg-[#FAF7F6] min-h-screen font-sans text-slate-700">
       <Header />
+      <main className="max-w-5xl mx-auto px-6 py-10">
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* LEFT OPTIONS PANEL */}
+          <div className="flex-1 space-y-5">
+            <button onClick={() => setSelectedCake(null)} className="flex items-center gap-2 text-gray-400 hover:text-rose-500 text-sm font-medium transition-colors mb-2">
+              <ArrowLeft size={16} /> Back to designs
+            </button>
 
-      <main style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 20px" }}>
-        {selectedCake ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "40px" }}>
-            {/* LEFT PANEL: SELECTIONS */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
-              <button
-                onClick={() => setSelectedCake(null)}
-                style={{ alignSelf: "flex-start", background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "1rem" }}
-              >
-                ← Back to Gallery
-              </button>
-
-              {/* COLOR */}
-              <div style={cardStyle}>
-                <h3 style={labelStyle}>Color</h3>
-                <div style={{ display: "flex", gap: "15px" }}>
-                  {["Pink", "White", "Blue", "Yellow"].map((c) => (
-                    <div
-                      key={c}
-                      onClick={() => handleChange("color", c)}
-                      style={{
-                        ...optionBoxStyle,
-                        borderColor: userChoice.color === c ? "#e91e63" : "#eee",
-                        backgroundColor: userChoice.color === c ? "#fff0f3" : "#fff",
-                      }}
-                    >
-                      <div
-                        style={{
-                          backgroundColor: c.toLowerCase(),
-                          width: "100%",
-                          height: "35px",
-                          borderRadius: "4px",
-                          border: "1px solid #eee",
-                        }}
-                      />
-                      <span style={{ fontSize: "12px", marginTop: "5px", display: "block" }}>{c}</span>
+            {/* COLOR SECTION */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
+              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
+                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Choose Color
+              </h3>
+              <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-hide">
+                {selectedCake.color?.map(c => (
+                  <div key={c._id} onClick={() => handleChange("color", c.name)} className="flex flex-col items-center gap-2 cursor-pointer group">
+                    <div className={`w-12 h-12 rounded-full relative flex items-center justify-center transition-all duration-300 shadow-sm ${userChoice.color === c.name ? 'ring-2 ring-rose-400 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ backgroundColor: c.name.toLowerCase() }}>
+                      {userChoice.color === c.name && <Check size={18} className="text-white drop-shadow-sm" />}
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* SIZE */}
-              <div style={cardStyle}>
-                <h3 style={labelStyle}>Size</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                  {[
-                    { label: "1 Pound",  },
-                    { label: "2 Pounds",  },
-                    { label: "3 Pounds",  },
-                    { label: "4 Pounds", },
-                  ].map((s) => (
-                    <div
-                      key={s.label}
-                      onClick={() => handleChange("size", s.label, s.price)}
-                      style={{
-                        ...sizeBoxStyle,
-                        borderColor: userChoice.size === s.label ? "#e91e63" : "#eee",
-                        backgroundColor: userChoice.size === s.label ? "#fff0f3" : "#fff",
-                      }}
-                    >
-                      <div style={{ fontWeight: "600" }}>{s.label}</div>
-                      <div style={{ fontSize: "0.85rem", color: "#666" }}>${s.price}</div>
-                      {userChoice.size === s.label && <div style={checkStyle}>✓</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* FLAVOR */}
-              <div style={cardStyle}>
-                <h3 style={labelStyle}>Flavor</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {[
-                    { name: "Vanilla", desc: "Classic and timeless" },
-                    { name: "Chocolate", desc: "Rich and decadent" },
-                    { name: "Strawberry", desc: "Fresh and fruity" },
-                    { name: "Red Velvet", desc: "Smooth and luxurious" },
-                  ].map((f) => (
-                    <div
-                      key={f.name}
-                      onClick={() => handleChange("flavor", f.name)}
-                      style={{
-                        ...flavorBoxStyle,
-                        borderColor: userChoice.flavor === f.name ? "#e91e63" : "#eee",
-                        backgroundColor: userChoice.flavor === f.name ? "#fff0f3" : "#fff",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: "600" }}>{f.name}</div>
-                        <div style={{ fontSize: "0.8rem", color: "#666" }}>{f.desc}</div>
-                      </div>
-                      {userChoice.flavor === f.name && <div style={{ color: "#e91e63", fontWeight: "bold" }}>✓</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT PANEL: IMAGE PREVIEW */}
-            <div style={{ position: "sticky", top: "20px", height: "fit-content", ...cardStyle, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
-              <h3 style={labelStyle}>Your Selection</h3>
-              <div style={{ width: "100%", height: "250px", overflow: "hidden", borderRadius: "12px", marginBottom: "20px", position: "relative" }}>
-                <img
-                  src={`http://localhost:5006/uploads/${selectedCake.referenceImage}`}
-                  alt="Preview"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                {/* Color overlay */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: userChoice.color.toLowerCase(),
-                    mixBlendMode: "multiply",
-                    opacity: 0.3,
-                    pointerEvents: "none",
-                    borderRadius: "12px",
-                  }}
-                />
-              </div>
-
-              <div style={{ borderTop: "1px solid #eee", paddingTop: "15px" }}>
-                <div style={summaryRow}><span>Color</span><strong>{userChoice.color}</strong></div>
-                <div style={summaryRow}><span>Size</span><strong>{userChoice.size}</strong></div>
-                <div style={summaryRow}><span>Flavor</span><strong>{userChoice.flavor}</strong></div>
-                <div style={summaryRow}><span>Price</span><strong>${userChoice.price}</strong></div>
-              </div>
-              <button style={btnStyle}>Add to Cart — ${userChoice.price}</button>
-            </div>
-          </div>
-        ) : (
-          /* GALLERY */
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
-            <h1 style={{ fontSize: "2.5rem", color: "#0a1d37", marginBottom: "10px" }}>Select a Base Cake</h1>
-            <p style={{ color: "#666", marginBottom: "40px" }}>Pick a style below to start customizing your dream cake.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "25px" }}>
-              {customizations.map((cake) => (
-                <div key={cake._id} onClick={() => handleCakeSelect(cake)} style={galleryItemStyle}>
-                  <img src={`http://localhost:5006/uploads/${cake.referenceImage}`} alt="cake" style={{ width: "100%", height: "220px", objectFit: "cover" }} />
-                  <div style={{ padding: "15px" }}>
-                    <h4 style={{ margin: "0 0 5px 0" }}>Base Cake #{cake._id.slice(-4)}</h4>
-                    <p style={{ fontSize: "13px", color: "#e91e63", fontWeight: "600", margin: 0 }}>Click to Customize</p>
+                    <span className={`text-[10px] font-bold tracking-tight ${userChoice.color === c.name ? 'text-rose-600' : 'text-gray-400'}`}>{c.name}</span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* SIZE SECTION */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
+              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
+                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Select Size
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {selectedCake.size?.map(s => {
+                  const isActive = userChoice.size === s.name;
+                  const price = selectedCake.basePrice * (parseInt(s.name) || 1);
+                  return (
+                    <div 
+                      key={s._id} 
+                      onClick={() => handleChange("size", s.name)} 
+                      className={`group relative p-4 rounded-[22px] border-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center ${
+                        isActive 
+                        ? 'border-rose-300 bg-white shadow-md shadow-rose-100' 
+                        : 'border-transparent bg-white/40 hover:bg-white'
+                      }`}
+                    >
+                      {s.name.includes("2") && (
+                        <span className="absolute -top-2 px-2 py-0.5 bg-rose-500 text-white text-[8px] font-black uppercase tracking-tighter rounded-full shadow-sm z-10">
+                          Popular
+                        </span>
+                      )}
+                      <p className={`text-sm font-black mb-0.5 ${isActive ? 'text-rose-600' : 'text-gray-800'}`}>{s.name}</p>
+                      <span className="text-[10px] text-gray-400 font-bold mb-2">Serves {parseInt(s.name) * 6}</span>
+                      <p className={`text-xs font-black ${isActive ? 'text-rose-500' : 'text-gray-400'}`}>Rs {price}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* FLAVOR SECTION */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
+              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
+                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Pick Flavor
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {selectedCake.flavour?.map(f => {
+                  const isActive = userChoice.flavor === f.name;
+                  return (
+                    <div key={f._id} onClick={() => handleChange("flavor", f.name)} className={`flex items-center justify-between p-3.5 rounded-[18px] border-2 cursor-pointer transition-all ${isActive ? 'border-rose-300 bg-white shadow-sm' : 'border-transparent bg-white/40 hover:bg-white'}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="bg-rose-50 w-9 h-9 rounded-xl flex items-center justify-center text-md">🍰</div>
+                        <div>
+                          <p className={`font-bold text-xs ${isActive ? 'text-rose-600' : 'text-gray-800'}`}>{f.name}</p>
+                          <p className="text-[8px] text-rose-400 font-black uppercase tracking-widest">Premium</p>
+                        </div>
+                      </div>
+                      {isActive && <Check size={14} className="text-rose-500" />}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        )}
-      </main>
 
+          {/* RIGHT SUMMARY SIDEBAR */}
+          <div className="lg:w-[360px]">
+            <div className="sticky top-10 bg-white rounded-[35px] p-8 shadow-xl shadow-rose-200/30 border border-rose-50">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-black text-gray-900 tracking-tight">Your Selection</h3>
+                <span className="text-[8px] font-black bg-rose-50 text-rose-500 px-2.5 py-1 rounded-full uppercase tracking-widest border border-rose-100">Live</span>
+              </div>
+
+              <div className="relative rounded-[28px] overflow-hidden mb-8 shadow-lg bg-gray-50 aspect-square group">
+                <img src={`http://localhost:5006${userChoice.colorImage || selectedCake.image}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
+                <div className="absolute bottom-4 right-4 w-9 h-9 rounded-full border-2 border-white shadow-xl" style={{ backgroundColor: userChoice.color?.toLowerCase() || '#f3f4f6' }}></div>
+              </div>
+
+              <div className="space-y-4 border-b border-dashed border-gray-100 pb-6 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Color</span>
+                  <span className="font-black text-gray-900 text-xs">{userChoice.color || "-"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Size</span>
+                  <span className="font-black text-gray-900 text-xs">{userChoice.size || "-"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Flavor</span>
+                  <span className="font-black text-gray-900 text-xs">{userChoice.flavor || "-"}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-end mb-8">
+                <span className="text-xs font-bold text-gray-400">Total</span>
+                <span className="text-xl font-black text-rose-400 tracking-tight">Rs {userChoice.price || 0}</span>
+              </div>
+
+              {/* SMALLER ADD TO CART BUTTON */}
+              <button 
+                disabled={!userChoice.color || !userChoice.size || !userChoice.flavor} 
+                className={`w-full py-4 rounded-[20px] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 ${userChoice.color && userChoice.size && userChoice.flavor ? 'bg-rose-400 text-white shadow-lg shadow-rose-100 hover:bg-rose-600 active:scale-95' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+              >
+                <ShoppingBag size={16} /> Add To Cart
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </main>
       <Footer />
     </div>
   );
 };
-
-// --- Styles ---
-const cardStyle = { backgroundColor: "white", padding: "25px", borderRadius: "15px", border: "1px solid #eee" };
-const labelStyle = { marginTop: 0, marginBottom: "20px", fontSize: "1.1rem", color: "#0a1d37" };
-const summaryRow = { display: "flex", justifyContent: "space-between", marginBottom: "12px", fontSize: "0.95rem" };
-const optionBoxStyle = { border: "2px solid", borderRadius: "10px", padding: "10px", cursor: "pointer", width: "75px", textAlign: "center", transition: "0.2s" };
-const sizeBoxStyle = { border: "2px solid", borderRadius: "12px", padding: "15px", cursor: "pointer", position: "relative", transition: "0.2s" };
-const flavorBoxStyle = { border: "2px solid", borderRadius: "12px", padding: "15px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "0.2s" };
-const checkStyle = { position: "absolute", top: "10px", right: "12px", color: "#e91e63", fontWeight: "bold" };
-const btnStyle = { width: "100%", padding: "16px", backgroundColor: "#e91e63", color: "white", border: "none", borderRadius: "12px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer", marginTop: "15px", boxShadow: "0 4px 12px rgba(233, 30, 99, 0.3)" };
-const galleryItemStyle = { backgroundColor: "#fff", borderRadius: "15px", overflow: "hidden", cursor: "pointer", border: "1px solid #eee", transition: "transform 0.3s", textAlign: "left", boxShadow: "0 4px 10px rgba(0,0,0,0.03)" };
 
 export default UserCustomize;

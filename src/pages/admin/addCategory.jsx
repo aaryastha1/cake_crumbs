@@ -77,7 +77,8 @@ export default function AddCategory() {
               <option value="occasion">Occasion</option>
               <option value="flavour">Flavour</option>
               <option value="size">Size</option>
-              <option value="color">Color</option> {/* ✅ Added color */}
+              <option value="color">Color</option>
+              <option value="bakeries">Bakeries</option> {/* ✅ Added color */}
             </select>
             {formik.errors.type && (
               <p className="text-red-500 text-sm">{formik.errors.type}</p>

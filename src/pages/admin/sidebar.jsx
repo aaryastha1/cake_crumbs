@@ -12,6 +12,7 @@ const Sidebar = () => {
     { name: "Orders", path: "/admin/orders", icon: FaUsers },
     { name: "Customers", path: "/admin/customers", icon: FaCookieBite },
     { name: "Customize Cakes", path: "/admin/customizes", icon: FaPalette },
+    { name: "bakeries", path: "/admin/bakery", icon: FaBoxOpen}
   ];
 
   return (
