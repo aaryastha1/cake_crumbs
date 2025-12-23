@@ -191,16 +191,7 @@ const CakeDetails = () => {
               </div>
 
               {/* Order Now */}
-              <button
-                className="w-full mt-4 py-3 px-6 font-bold transition hover:bg-pink-50 flex items-center justify-center text-lg rounded-xl"
-                style={{
-                  color: secondaryColor,
-                  border: `2px solid ${primaryColor}`,
-                }}
-                onClick={() => console.log('Order Now clicked')}
-              >
-                <Phone size={22} className="mr-2" /> ORDER NOW (Call Us)
-              </button>
+            
             </div>
           </div>
         </div>

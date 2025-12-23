@@ -1,10 +1,8 @@
-// src/pages/BakeryProducts.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { Heart, Star, Timer } from "lucide-react"; // Matching icons from UI
+import { Heart, ShoppingCart, X, Minus, Plus } from "lucide-react";
 
-// Components
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -12,6 +10,8 @@ const BakeryProducts = () => {
   const { categoryId } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   const API = import.meta.env.VITE_API_URL || "http://localhost:5006";
 
@@ -20,111 +20,111 @@ const BakeryProducts = () => {
       setLoading(true);
       try {
         let url = `${API}/api/admin/bakery`;
-        if (categoryId) {
-          url += `/category/${categoryId}`;
-        }
+        if (categoryId) url += `/category/${categoryId}`;
         const res = await axios.get(url);
         setProducts(res.data);
       } catch (err) {
-        console.error("Error fetching bakery products:", err);
-        setProducts([]);
+        console.error("Error fetching products:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchBakeryProducts();
   }, [categoryId]);
 
   return (
-    <div className="bg-[#FAF7F6] min-h-screen font-sans">
+    <div className="bg-[#FAF7F6] min-h-screen font-sans antialiased text-[#2D3E50]">
       <Header />
 
-      <div className="max-w-7xl mx-auto p-6 lg:px-12">
-        {loading ? (
-          <div className="min-h-[60vh] flex items-center justify-center text-gray-400 font-medium">
-            Loading delicious items...
-          </div>
-        ) : products.length === 0 ? (
-          <div className="min-h-[60vh] flex items-center justify-center text-gray-400 font-medium">
-            No bakery items available.
-          </div>
-        ) : (
-          <>
-            <div className="mb-8">
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight uppercase">
-                {products[0]?.category?.name || "Our Bakery"}
-              </h1>
-              <p className="text-gray-400 text-sm font-medium">Freshly baked every single day</p>
-            </div>
+      <div className="max-w-[1200px] mx-auto p-6 lg:px-10">
+        <div className="mb-8">
+          <h1 className="text-2xl font-black tracking-tight uppercase mb-1">
+            {products[0]?.category?.name || "PASTRIES"}
+          </h1>
+          <p className="text-gray-400 text-xs font-medium">Freshly baked every single day</p>
+        </div>
 
-            {/* Same size grid pattern as image_677b0b.jpg */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((item) => (
-                <div
-                  key={item._id}
-                  className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-50"
-                >
-                  {/* Image Container with Badges */}
-                  <div className="relative h-60 overflow-hidden">
-                    {item.image ? (
-                      <img
-                        src={`${API}${item.image}`}
-                        alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
-                        No Image
-                      </div>
-                    )}
-
-                    {/* Floating Badges matching UI */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                      <span className="bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">
-                        New
-                      </span>
-                      <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                        <Star size={10} className="fill-yellow-400 text-yellow-400" />
-                        <span className="text-[10px] font-black text-gray-800">4.8</span>
-                      </div>
-                    </div>
-
-                    {/* Heart Icon */}
-                    <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-400 hover:text-rose-500 transition-colors shadow-sm">
-                      <Heart size={18} />
-                    </button>
-                  </div>
-
-                  {/* Content Area */}
-                  <div className="p-6">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">
-                      {item.category?.name || "Pastries"}
-                    </span>
-                    <h2 className="text-lg font-bold text-gray-800 leading-tight mb-3">
-                      {item.name}
-                    </h2>
-
-                    <div className="flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="text-rose-500 font-black text-xl tracking-tighter">
-                          Rs {item.price}
-                        </span>
-                      </div>
-                      
-                      {/* Delivery Time Tag matching UI */}
-                      <div className="flex items-center gap-1.5 text-gray-400">
-                        <Timer size={14} className="text-indigo-400" />
-                        <span className="text-[11px] font-bold">30 min</span>
-                      </div>
-                    </div>
-                  </div>
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((item) => (
+            <div
+              key={item._id}
+              onClick={() => { setSelectedProduct(item); setQuantity(1); }}
+              className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group border border-transparent hover:border-rose-50"
+            >
+              <div className="relative aspect-[5/4] overflow-hidden">
+                <img src={`${API}${item.image}`} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-3 left-3">
+                  <span className="bg-[#E24C63] text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase">New</span>
                 </div>
-              ))}
+              </div>
+              <div className="p-4">
+                <span className="text-[9px] font-bold text-[#E24C63] uppercase tracking-widest block mb-1">Pastries</span>
+                <h2 className="text-[15px] font-bold mb-3 truncate">{item.name}</h2>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#E24C63] font-black text-lg tracking-tight">Rs {item.price}</span>
+                  <div className="bg-[#E24C63] text-white p-1.5 rounded-full shadow-md"><ShoppingCart size={14} /></div>
+                </div>
+              </div>
             </div>
-          </>
-        )}
+          ))}
+        </div>
       </div>
+
+      {/* --- Refined & Smaller Modal --- */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" onClick={() => setSelectedProduct(null)} />
+          
+          <div className="bg-white w-full max-w-[360px] rounded-[28px] overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            {/* Close Button */}
+            <button 
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-3 right-3 z-20 bg-white/80 backdrop-blur-md rounded-full p-1.5 shadow-sm hover:bg-white transition-colors border border-gray-100"
+            >
+              <X size={16} />
+            </button>
+
+            {/* Image */}
+            <div className="relative h-56">
+              <img src={`${API}${selectedProduct.image}`} className="w-full h-full object-cover" alt="" />
+              <div className="absolute top-3 left-3">
+                <span className="bg-[#E24C63] text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase">New</span>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <span className="text-[9px] font-bold text-[#E24C63] uppercase tracking-[0.15em] block mb-1">Pastries</span>
+              <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
+              <p className="text-gray-400 text-[12px] leading-relaxed mb-5">
+                Baked with premium ingredients for the perfect artisan texture and flavor.
+              </p>
+
+              <div className="text-[#E24C63] font-black text-2xl mb-6">
+                Rs {selectedProduct.price}
+              </div>
+
+              {/* Quantity Selector */}
+              <div className="flex items-center justify-between mb-6 bg-gray-50 p-2 rounded-2xl">
+                <span className="text-gray-500 text-[11px] font-semibold ml-2">Quantity</span>
+                <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-100 px-3 py-1 gap-4">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-[#E24C63]"><Minus size={14} /></button>
+                  <span className="font-bold text-sm w-4 text-center">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-[#E24C63]"><Plus size={14} /></button>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button className="w-full bg-[#E24C63] active:scale-95 text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-rose-100 text-sm">
+                <ShoppingCart size={16} fill="currentColor" />
+                <span>Add to Cart — Rs {selectedProduct.price * quantity}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

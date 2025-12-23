@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Check, ShoppingBag, ArrowLeft, Users } from "lucide-react";
+import { Check, ShoppingBag, ArrowLeft, Heart } from "lucide-react";
 
 const UserCustomize = () => {
   const [customizations, setCustomizations] = useState([]);
   const [selectedCake, setSelectedCake] = useState(null);
+  
+  // ✅ State to track wishlisted items
+  const [wishlist, setWishlist] = useState([]);
+
   const [userChoice, setUserChoice] = useState({
     color: "",
     size: "",
@@ -15,10 +19,12 @@ const UserCustomize = () => {
     colorImage: "",
   });
 
+  const API_URL = "http://localhost:5006";
+
   useEffect(() => {
     const fetchCakes = async () => {
       try {
-        const res = await axios.get("http://localhost:5006/api/admin/custom-cakes");
+        const res = await axios.get(`${API_URL}/api/admin/custom-cakes`);
         setCustomizations(res.data);
       } catch (err) {
         console.error("Error fetching cakes:", err);
@@ -33,6 +39,16 @@ const UserCustomize = () => {
     setUserChoice({ color: "", size: "", flavor: "", price: 0, colorImage: cake.image });
   };
 
+  // ✅ Toggle Wishlist Function
+  const toggleWishlist = (e, cakeId) => {
+    if (e) e.stopPropagation(); // Prevents moving to customization view when clicking heart
+    setWishlist((prev) =>
+      prev.includes(cakeId)
+        ? prev.filter((id) => id !== cakeId)
+        : [...prev, cakeId]
+    );
+  };
+
   const handleChange = (key, value) => {
     if (key === "size") {
       const weight = parseInt(value) || 1;
@@ -45,20 +61,53 @@ const UserCustomize = () => {
     }
   };
 
+  // --- BASE STYLE SELECTION VIEW ---
   if (!selectedCake) {
     return (
-      <div className="bg-[#FAF7F6] min-h-screen">
+      <div className="bg-[#FAF7F6] min-h-screen font-sans">
         <Header />
-        <main className="max-w-7xl mx-auto px-6 py-12">
-          <h1 className="text-2xl font-serif text-gray-800 text-center mb-8">Choose Your Base Style</h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {customizations.map(cake => (
-              <div key={cake._id} onClick={() => handleCakeSelect(cake)} className="bg-white rounded-[28px] p-3 shadow-sm hover:shadow-lg transition-all cursor-pointer border border-transparent hover:border-rose-100 group">
-                <img src={`http://localhost:5006${cake.image}`} className="w-full h-56 object-cover rounded-[20px] mb-3 group-hover:scale-[1.02] transition-transform" alt="" />
-                <h3 className="font-bold text-gray-800 text-md ml-2">{cake.name}</h3>
-                <p className="text-rose-500 font-medium text-sm ml-2">From Rs {cake.basePrice}</p>
-              </div>
-            ))}
+        <main className="max-w-7xl mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-serif text-[#2D3E50] mb-3">Choose Your Base Style</h1>
+            <p className="text-gray-500 text-sm italic">Each cake is handcrafted with love using premium ingredients</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {customizations.map(cake => {
+              const isLiked = wishlist.includes(cake._id);
+              
+              return (
+                <div 
+                  key={cake._id} 
+                  onClick={() => handleCakeSelect(cake)} 
+                  className="bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer group border border-transparent hover:border-rose-100"
+                >
+                  <div className="relative aspect-square overflow-hidden">
+                    <img 
+                      src={`${API_URL}${cake.image}`} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                      alt={cake.name} 
+                    />
+                    
+                    {/* ✅ Heart/Wishlist button */}
+                    <button 
+                      onClick={(e) => toggleWishlist(e, cake._id)}
+                      className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full shadow-sm transition-all duration-300 hover:scale-110"
+                    >
+                      <Heart 
+                        size={18} 
+                        fill={isLiked ? "#E24C63" : "none"} 
+                        className={isLiked ? "text-[#E24C63]" : "text-gray-400"} 
+                      />
+                    </button>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-[#2D3E50] text-lg mb-1">{cake.name}</h3>
+                    <p className="text-[#E24C63] font-bold text-sm">From Rs {cake.basePrice.toLocaleString()}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </main>
         <Footer />
@@ -66,41 +115,47 @@ const UserCustomize = () => {
     );
   }
 
+  // --- CUSTOMIZATION VIEW ---
   return (
-    <div className="bg-[#FAF7F6] min-h-screen font-sans text-slate-700">
+    <div className="bg-[#FAF7F6] min-h-screen font-sans text-slate-700 antialiased">
       <Header />
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* LEFT OPTIONS PANEL */}
-          <div className="flex-1 space-y-5">
-            <button onClick={() => setSelectedCake(null)} className="flex items-center gap-2 text-gray-400 hover:text-rose-500 text-sm font-medium transition-colors mb-2">
-              <ArrowLeft size={16} /> Back to designs
-            </button>
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        <button 
+          onClick={() => setSelectedCake(null)} 
+          className="flex items-center gap-2 text-gray-400 hover:text-[#E24C63] text-sm font-bold transition-colors mb-8 group"
+        >
+          <div className="p-2 bg-white rounded-full shadow-sm group-hover:shadow-md transition-all">
+            <ArrowLeft size={16} />
+          </div>
+          BACK TO DESIGNS
+        </button>
 
-            {/* COLOR SECTION */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
-              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
-                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Choose Color
-              </h3>
-              <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          
+          {/* LEFT: OPTIONS PANEL */}
+          <div className="flex-1 space-y-6">
+            {/* COLOR */}
+            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-rose-50/50">
+              <h3 className="text-lg font-black text-[#2D3E50] mb-6 tracking-tight uppercase text-[13px]">1. Choose Color</h3>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {selectedCake.color?.map(c => (
-                  <div key={c._id} onClick={() => handleChange("color", c.name)} className="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div className={`w-12 h-12 rounded-full relative flex items-center justify-center transition-all duration-300 shadow-sm ${userChoice.color === c.name ? 'ring-2 ring-rose-400 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ backgroundColor: c.name.toLowerCase() }}>
-                      {userChoice.color === c.name && <Check size={18} className="text-white drop-shadow-sm" />}
+                  <div key={c._id} onClick={() => handleChange("color", c.name)} className="flex flex-col items-center gap-3 cursor-pointer group min-w-[60px]">
+                    <div 
+                      className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-inner ${userChoice.color === c.name ? 'ring-4 ring-rose-100 scale-110 shadow-lg' : 'hover:scale-105 border-4 border-white'}`} 
+                      style={{ backgroundColor: c.name.toLowerCase() }}
+                    >
+                      {userChoice.color === c.name && <Check size={20} className="text-white drop-shadow-md" />}
                     </div>
-                    <span className={`text-[10px] font-bold tracking-tight ${userChoice.color === c.name ? 'text-rose-600' : 'text-gray-400'}`}>{c.name}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${userChoice.color === c.name ? 'text-rose-500' : 'text-gray-400'}`}>{c.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* SIZE SECTION */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
-              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
-                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Select Size
-              </h3>
-              <div className="grid grid-cols-3 gap-3">
+            {/* SIZE */}
+            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-rose-50/50">
+              <h3 className="text-lg font-black text-[#2D3E50] mb-6 tracking-tight uppercase text-[13px]">2. Select Weight</h3>
+              <div className="grid grid-cols-3 gap-4">
                 {selectedCake.size?.map(s => {
                   const isActive = userChoice.size === s.name;
                   const price = selectedCake.basePrice * (parseInt(s.name) || 1);
@@ -108,44 +163,30 @@ const UserCustomize = () => {
                     <div 
                       key={s._id} 
                       onClick={() => handleChange("size", s.name)} 
-                      className={`group relative p-4 rounded-[22px] border-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center ${
-                        isActive 
-                        ? 'border-rose-300 bg-white shadow-md shadow-rose-100' 
-                        : 'border-transparent bg-white/40 hover:bg-white'
-                      }`}
+                      className={`p-5 rounded-[24px] border-2 transition-all duration-300 flex flex-col items-center text-center cursor-pointer ${isActive ? 'border-rose-400 bg-rose-50/30' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-rose-200'}`}
                     >
-                      {s.name.includes("2") && (
-                        <span className="absolute -top-2 px-2 py-0.5 bg-rose-500 text-white text-[8px] font-black uppercase tracking-tighter rounded-full shadow-sm z-10">
-                          Popular
-                        </span>
-                      )}
-                      <p className={`text-sm font-black mb-0.5 ${isActive ? 'text-rose-600' : 'text-gray-800'}`}>{s.name}</p>
-                      <span className="text-[10px] text-gray-400 font-bold mb-2">Serves {parseInt(s.name) * 6}</span>
-                      <p className={`text-xs font-black ${isActive ? 'text-rose-500' : 'text-gray-400'}`}>Rs {price}</p>
+                      <p className={`text-base font-black ${isActive ? 'text-rose-600' : 'text-[#2D3E50]'}`}>{s.name} KG</p>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Rs {price.toLocaleString()}</p>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* FLAVOR SECTION */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-[30px] p-6 shadow-sm border border-white">
-              <h3 className="text-md font-bold mb-5 flex items-center gap-2">
-                <span className="w-1 h-5 bg-rose-400 rounded-full"></span> Pick Flavor
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
+            {/* FLAVOR */}
+            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-rose-50/50">
+              <h3 className="text-lg font-black text-[#2D3E50] mb-6 tracking-tight uppercase text-[13px]">3. Pick Flavor</h3>
+              <div className="grid grid-cols-2 gap-4">
                 {selectedCake.flavour?.map(f => {
                   const isActive = userChoice.flavor === f.name;
                   return (
-                    <div key={f._id} onClick={() => handleChange("flavor", f.name)} className={`flex items-center justify-between p-3.5 rounded-[18px] border-2 cursor-pointer transition-all ${isActive ? 'border-rose-300 bg-white shadow-sm' : 'border-transparent bg-white/40 hover:bg-white'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className="bg-rose-50 w-9 h-9 rounded-xl flex items-center justify-center text-md">🍰</div>
-                        <div>
-                          <p className={`font-bold text-xs ${isActive ? 'text-rose-600' : 'text-gray-800'}`}>{f.name}</p>
-                          <p className="text-[8px] text-rose-400 font-black uppercase tracking-widest">Premium</p>
-                        </div>
-                      </div>
-                      {isActive && <Check size={14} className="text-rose-500" />}
+                    <div 
+                      key={f._id} 
+                      onClick={() => handleChange("flavor", f.name)} 
+                      className={`flex items-center justify-between p-4 rounded-[20px] border-2 transition-all cursor-pointer ${isActive ? 'border-rose-400 bg-rose-50/30' : 'border-gray-100 bg-gray-50/50 hover:bg-white'}`}
+                    >
+                      <span className={`font-bold text-xs ${isActive ? 'text-rose-600' : 'text-[#2D3E50]'}`}>{f.name}</span>
+                      {isActive && <Check size={16} className="text-rose-500" />}
                     </div>
                   );
                 })}
@@ -153,49 +194,52 @@ const UserCustomize = () => {
             </div>
           </div>
 
-          {/* RIGHT SUMMARY SIDEBAR */}
-          <div className="lg:w-[360px]">
-            <div className="sticky top-10 bg-white rounded-[35px] p-8 shadow-xl shadow-rose-200/30 border border-rose-50">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-black text-gray-900 tracking-tight">Your Selection</h3>
-                <span className="text-[8px] font-black bg-rose-50 text-rose-500 px-2.5 py-1 rounded-full uppercase tracking-widest border border-rose-100">Live</span>
+          {/* RIGHT: STICKY SUMMARY */}
+          <div className="lg:w-[400px] sticky top-10">
+            <div className="bg-white rounded-[40px] p-10 shadow-2xl shadow-rose-200/20 border border-rose-50 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50/50 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+              
+              <h3 className="text-xl font-black text-[#2D3E50] mb-8 flex items-center gap-2">
+                Order Summary
+                {/* ✅ Heart for selected cake */}
+                <button
+                  onClick={() => toggleWishlist(null, selectedCake._id)}
+                  className="ml-auto p-2 bg-white/80 rounded-full shadow-sm hover:scale-110"
+                >
+                  <Heart 
+                    size={20} 
+                    fill={wishlist.includes(selectedCake._id) ? "#E24C63" : "none"} 
+                    className={wishlist.includes(selectedCake._id) ? "text-[#E24C63]" : "text-gray-400"} 
+                  />
+                </button>
+              </h3>
+
+              <div className="relative rounded-[30px] overflow-hidden mb-8 shadow-xl aspect-square border-4 border-white">
+                <img src={`${API_URL}${userChoice.colorImage || selectedCake.image}`} className="w-full h-full object-cover transition-transform duration-1000" alt="Preview" />
               </div>
 
-              <div className="relative rounded-[28px] overflow-hidden mb-8 shadow-lg bg-gray-50 aspect-square group">
-                <img src={`http://localhost:5006${userChoice.colorImage || selectedCake.image}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                <div className="absolute bottom-4 right-4 w-9 h-9 rounded-full border-2 border-white shadow-xl" style={{ backgroundColor: userChoice.color?.toLowerCase() || '#f3f4f6' }}></div>
+              <div className="space-y-4 mb-8">
+                {['color', 'size', 'flavor'].map(field => (
+                  <div key={field} className="flex justify-between items-center bg-gray-50/80 px-4 py-3 rounded-2xl">
+                    <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{field}</span>
+                    <span className="font-black text-[#2D3E50] text-xs">{userChoice[field] || "Not Selected"}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="space-y-4 border-b border-dashed border-gray-100 pb-6 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Color</span>
-                  <span className="font-black text-gray-900 text-xs">{userChoice.color || "-"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Size</span>
-                  <span className="font-black text-gray-900 text-xs">{userChoice.size || "-"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-bold text-[10px] uppercase tracking-wider">Flavor</span>
-                  <span className="font-black text-gray-900 text-xs">{userChoice.flavor || "-"}</span>
-                </div>
+              <div className="flex justify-between items-center mb-10 px-2">
+                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Total Price</span>
+                <span className="text-3xl font-black text-[#E24C63]">Rs {userChoice.price.toLocaleString()}</span>
               </div>
 
-              <div className="flex justify-between items-end mb-8">
-                <span className="text-xs font-bold text-gray-400">Total</span>
-                <span className="text-xl font-black text-rose-400 tracking-tight">Rs {userChoice.price || 0}</span>
-              </div>
-
-              {/* SMALLER ADD TO CART BUTTON */}
               <button 
                 disabled={!userChoice.color || !userChoice.size || !userChoice.flavor} 
-                className={`w-full py-4 rounded-[20px] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 ${userChoice.color && userChoice.size && userChoice.flavor ? 'bg-rose-400 text-white shadow-lg shadow-rose-100 hover:bg-rose-600 active:scale-95' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                className={`w-full py-5 rounded-[24px] font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all duration-500 ${userChoice.color && userChoice.size && userChoice.flavor ? 'bg-[#E24C63] text-white shadow-xl shadow-rose-200 hover:bg-[#c93d52] hover:-translate-y-1 active:scale-95' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
               >
-                <ShoppingBag size={16} /> Add To Cart
+                <ShoppingBag size={18} /> Add To Cart
               </button>
             </div>
           </div>
-
         </div>
       </main>
       <Footer />
