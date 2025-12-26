@@ -21,7 +21,6 @@ export default function AddCategory() {
       image: null,
     },
     validationSchema,
-
     onSubmit: async (values, { resetForm }) => {
       try {
         if (!multiValue.trim()) {
@@ -57,6 +56,28 @@ export default function AddCategory() {
     },
   });
 
+  // Dynamic placeholder text based on selected type
+  const getPlaceholder = (type) => {
+    switch (type) {
+      case "occasion":
+        return "Birthday, Anniversary, Wedding";
+      case "size":
+        return "0.5kg, 1kg, 2kg";
+      case "flavour":
+        return "Vanilla, Chocolate, Strawberry";
+      case "color":
+        return "Red, Blue, Black";
+      case "bakeries":
+        return "Bakery A, Bakery B";
+      case "shape":
+        return "Round, Square, Heart"; // ✅ Shape placeholder
+      case "topping":
+        return "Choco Chips, Sprinkles, Fruits"; // ✅ Topping placeholder
+      default:
+        return "Enter values separated by comma";
+    }
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6">
       <div className="bg-white w-full max-w-xl p-6 rounded-lg shadow">
@@ -78,7 +99,9 @@ export default function AddCategory() {
               <option value="flavour">Flavour</option>
               <option value="size">Size</option>
               <option value="color">Color</option>
-              <option value="bakeries">Bakeries</option> {/* ✅ Added color */}
+              <option value="bakeries">Bakeries</option>
+              <option value="shape">Shape</option> {/* ✅ Added */}
+              <option value="topping">Topping</option> {/* ✅ Added */}
             </select>
             {formik.errors.type && (
               <p className="text-red-500 text-sm">{formik.errors.type}</p>
@@ -94,15 +117,7 @@ export default function AddCategory() {
             </label>
             <input
               type="text"
-              placeholder={
-                formik.values.type === "occasion"
-                  ? "Birthday, Anniversary"
-                  : formik.values.type === "size"
-                  ? "0.5kg, 1kg, 2kg"
-                  : formik.values.type === "flavour"
-                  ? "Vanilla, Chocolate"
-                  : "Red, Blue, Black" // ✅ Color placeholder
-              }
+              placeholder={getPlaceholder(formik.values.type)}
               value={multiValue}
               onChange={(e) => setMultiValue(e.target.value)}
               className="w-full border px-3 py-2 rounded"
