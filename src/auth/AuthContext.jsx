@@ -5,44 +5,41 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
+  // Load initial state from storage
   useEffect(() => {
     try {
       const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+      const savedToken = localStorage.getItem("token") || null;
       if (savedUser) setUser(savedUser);
+      if (savedToken) setToken(savedToken);
     } catch (err) {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
-
-    const savedToken = localStorage.getItem("token") || null;
-    if (savedToken) setToken(savedToken);
   }, []);
 
-  useEffect(() => {
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else localStorage.removeItem("user");
-  }, [user]);
-
-  useEffect(() => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
-  }, [token]);
-
+  // Update logic: Immediate persistence
   const login = (userData, tokenData) => {
+    // 1. Update Storage IMMEDIATELY so axios interceptor sees it
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", tokenData);
+
+    // 2. Update State for UI
     setUser(userData);
     setToken(tokenData);
-    navigate("/");
+    
+    // Note: navigate is moved to the Login component for better control
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.clear(); // Clears everything including user, token, and potentially cart status
     navigate("/");
+    window.location.reload(); // Ensures all context states reset
   };
 
   return (

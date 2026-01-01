@@ -90,7 +90,10 @@ import UserCustomizes from "../pages/Customizecake";
 import BakeryProducts from "../pages/bakeries";
 import Profile from "../pages/profile";
 import FavoritesPage from "../pages/favoritepage";
-import CakePreview from "../pages/cakepreview"
+import CakePreview from "../pages/cakepreview";
+import Checkout from "../pages/checkout";
+import ProductDetailsPage from "../pages/productDetailPage";
+
 // ✅ new user page
 
 // Admin layout
@@ -133,8 +136,12 @@ export default function AppRoutes() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/favorites" element= {<FavoritesPage/>}/>
       <Route path="/cake-preview" element={<CakePreview />} />
-      // App.jsx
+
+      <Route path="/checkout" element={<Checkout />} />
+   
 <Route path="/preview/:id" element={<CakePreview />} />
+<Route path="/product/:productId" element={<ProductDetailsPage />} />
+
       
       
 

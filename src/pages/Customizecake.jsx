@@ -5,6 +5,7 @@ import { useSnapshot } from 'valtio';
 import { motion } from 'framer-motion';
 import { SketchPicker } from 'react-color';
 import { Upload, RotateCw, Sparkles as SparkleIcon, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // IMPORTED THIS
 import { state } from '../store/store';
 
 // --- COMPONENTS ---
@@ -170,6 +171,7 @@ function CakeModel() {
 // --- UI PAGE ---
 export default function Customizecake() {
   const snap = useSnapshot(state);
+  const navigate = useNavigate(); // INITIALIZED NAVIGATE HOOK
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#f8f9fa] overflow-hidden">
@@ -177,17 +179,18 @@ export default function Customizecake() {
 
       <main className="flex-grow relative overflow-hidden flex items-center justify-center">
         {/* NEXT BUTTON – RIGHT SIDE */}
-<div className="absolute right-10 bottom-10 z-20">
-  <button
-    onClick={() => {
-      localStorage.setItem('cakeDesign', JSON.stringify(state));
-      window.location.href = '/cake-preview';
-    }}
-    className="bg-gradient-to-r from-pink-600 to-rose-500 text-white font-black px-10 py-5 rounded-full shadow-[0_15px_30px_rgba(219,39,119,0.4)] transition-all flex items-center gap-3 tracking-widest text-sm"
-  >
-    NEXT →
-  </button>
-</div>
+        <div className="absolute right-10 bottom-10 z-20">
+          <button
+            onClick={() => {
+              localStorage.setItem('cakeDesign', JSON.stringify(state));
+              // UPDATED TO NAVIGATE INSTEAD OF WINDOW.LOCATION
+              navigate('/cake-preview'); 
+            }}
+            className="bg-gradient-to-r from-pink-600 to-rose-500 text-white font-black px-10 py-5 rounded-full shadow-[0_15px_30px_rgba(219,39,119,0.4)] transition-all flex items-center gap-3 tracking-widest text-sm"
+          >
+            NEXT →
+          </button>
+        </div>
 
         {/* Canvas Area */}
         <div className="absolute inset-0 z-0">
@@ -196,7 +199,6 @@ export default function Customizecake() {
             <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} castShadow />
             <Environment preset="city" />
             <Suspense fallback={null}>
-              {/* Removed "top" prop to center the object perfectly in the middle of the available space */}
               <Center>
                   <CakeModel />
               </Center>
@@ -206,7 +208,7 @@ export default function Customizecake() {
           </Canvas>
         </div>
 
-        {/* Refined Sidebar UI */}
+        {/* Sidebar UI */}
         <div className="absolute inset-0 p-6 pointer-events-none flex items-start justify-start">
           <motion.div 
             initial={{ x: -100, opacity: 0 }} 
@@ -257,7 +259,6 @@ export default function Customizecake() {
             </div>
 
             <div className="mt-8 space-y-6">
-              {/* Border Styles */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 block">Border Detail</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -273,7 +274,6 @@ export default function Customizecake() {
                 </div>
               </div>
 
-              {/* Extra Toppings */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 block">Garnish</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -289,7 +289,6 @@ export default function Customizecake() {
                 </div>
               </div>
 
-              {/* Utility Buttons */}
               <div className="flex gap-2">
                 <button 
                   onClick={() => state.showSparkles = !state.showSparkles} 
@@ -305,7 +304,6 @@ export default function Customizecake() {
                 </button>
               </div>
 
-              {/* File Upload */}
               <label className="flex items-center justify-center gap-3 bg-gradient-to-r from-gray-800 to-black text-white p-4 rounded-2xl cursor-pointer hover:shadow-2xl transition-all shadow-xl group">
                 <Upload size={16} className="group-hover:-translate-y-1 transition-transform" /> 
                 <span className="text-xs font-black uppercase tracking-widest">Add Custom Decal</span>
