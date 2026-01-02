@@ -232,12 +232,14 @@
 
 // export default Header;
 
-import React, { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Heart, ShoppingCart, User, Search, X } from "lucide-react";
+import { Heart, ShoppingCart, User, X } from "lucide-react";
 import axios from "axios";
 import { useFavorites } from "../context/favoriteContext";
 import { useCart } from "../context/cartContext";
+import { AuthContext } from "../auth/AuthContext"; // ✅ ADDED
 
 const Header = () => {
   const location = useLocation();
@@ -245,9 +247,12 @@ const Header = () => {
   const { cart, setIsCartOpen } = useCart();
   const { favorites } = useFavorites();
 
+  // ✅ AUTH CONTEXT (FIX)
+  const { user, token } = useContext(AuthContext);
+  const isLoggedIn = !!token;
+
   const [occasions, setOccasions] = useState([]);
   const [bakeries, setBakeries] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // --- Search Logic States ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -258,16 +263,13 @@ const Header = () => {
   const API = import.meta.env.VITE_API_URL || "http://localhost:5006";
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
-
-  useEffect(() => {
     const fetchOccasions = async () => {
       try {
         const res = await axios.get(`${API}/api/admin/categories/type/occasion`);
         setOccasions(res.data.categories);
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     };
     fetchOccasions();
   }, [API]);
@@ -277,18 +279,19 @@ const Header = () => {
       try {
         const res = await axios.get(`${API}/api/admin/categories/type/bakeries`);
         setBakeries(res.data.categories);
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     };
     fetchBakeries();
   }, [API]);
 
-  // --- Live Search Functionality ---
+  // --- Live Search ---
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length > 1) {
         try {
           const res = await axios.get(`${API}/api/search?q=${searchQuery}`);
-          // Combine products and bakeries to show as a single product list
           setSearchResults([...res.data.products, ...res.data.bakeries]);
           setShowDropdown(true);
         } catch (err) {
@@ -334,6 +337,7 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-md z-50 sticky top-0 font-sans">
       <div className="flex items-center px-12 py-3 border-b border-pink-100 gap-10">
+
         {/* Logo + Navigation */}
         <div className="flex items-center gap-8 flex-shrink-0">
           <Link to="/">
@@ -343,26 +347,41 @@ const Header = () => {
           <nav className="flex items-center">
             <div className="flex gap-7">
               {navItems.map((item) => {
-                const active = item.path === "/" ? location.pathname === "/" : location.pathname.startsWith(item.path);
+                const active =
+                  item.path === "/"
+                    ? location.pathname === "/"
+                    : location.pathname.startsWith(item.path);
 
                 if (item.name === "Bakeries" || item.name === "Occasions") {
                   const data = item.name === "Bakeries" ? bakeries : occasions;
                   const path = item.name === "Bakeries" ? "bakeries" : "occasions";
+
                   return (
                     <div key={item.name} className="relative group">
                       <span
-                        className={`text-sm tracking-wide cursor-pointer transition-all ${active ? "font-bold" : "text-gray-600 hover:text-pink-600"}`}
+                        className={`text-sm tracking-wide cursor-pointer transition-all ${
+                          active ? "font-bold" : "text-gray-600 hover:text-pink-600"
+                        }`}
                         style={{ color: active ? secondaryPink : "" }}
                       >
                         {item.name} <span className="ml-1">▼</span>
                       </span>
+
                       <div className="absolute top-full left-0 mt-1 bg-white border rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 min-w-[150px]">
-                        {data.length > 0 ? data.map((b) => (
-                          <Link key={b._id} to={`/${path}/${b._id}`} className="block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600 text-sm">
-                            {b.name}
-                          </Link>
-                        )) : (
-                          <span className="block px-4 py-2 text-gray-400 text-sm">No {item.name}</span>
+                        {data.length > 0 ? (
+                          data.map((b) => (
+                            <Link
+                              key={b._id}
+                              to={`/${path}/${b._id}`}
+                              className="block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600 text-sm"
+                            >
+                              {b.name}
+                            </Link>
+                          ))
+                        ) : (
+                          <span className="block px-4 py-2 text-gray-400 text-sm">
+                            No {item.name}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -373,11 +392,22 @@ const Header = () => {
                   <Link
                     key={item.name}
                     to={item.path}
-                    className={`text-sm tracking-wide relative transition-all ${active ? "font-bold" : "text-gray-600 hover:text-pink-600"}`}
+                    className={`text-sm tracking-wide relative transition-all ${
+                      active ? "font-bold" : "text-gray-600 hover:text-pink-600"
+                    }`}
                     style={{ color: active ? secondaryPink : "" }}
                   >
                     {item.name}
-                    {active && <span className="absolute left-0 right-0 mx-auto h-[2px] rounded-full" style={{ backgroundColor: primaryPink, width: "100%", bottom: "-3px" }} />}
+                    {active && (
+                      <span
+                        className="absolute left-0 right-0 mx-auto h-[2px] rounded-full"
+                        style={{
+                          backgroundColor: primaryPink,
+                          width: "100%",
+                          bottom: "-3px",
+                        }}
+                      />
+                    )}
                   </Link>
                 );
               })}
@@ -385,7 +415,7 @@ const Header = () => {
           </nav>
         </div>
 
-        {/* 🔍 Search Bar (Updated with Link Logic) */}
+        {/* 🔍 Search */}
         <div className="relative flex items-center flex-grow" ref={searchRef}>
           <input
             type="text"
@@ -397,13 +427,12 @@ const Header = () => {
           />
           <span className="absolute left-3 text-pink-500 text-lg">🔍</span>
           {searchQuery && (
-            <X 
-              className="absolute right-4 w-4 h-4 text-gray-400 cursor-pointer hover:text-pink-500" 
-              onClick={() => setSearchQuery("")} 
+            <X
+              className="absolute right-4 w-4 h-4 text-gray-400 cursor-pointer hover:text-pink-500"
+              onClick={() => setSearchQuery("")}
             />
           )}
 
-          {/* Results Dropdown */}
           {showDropdown && (
             <div className="absolute top-full left-0 w-full mt-2 bg-white border border-pink-100 rounded-xl shadow-xl z-[100] max-h-80 overflow-y-auto">
               {searchResults.length > 0 ? (
@@ -411,7 +440,6 @@ const Header = () => {
                   {searchResults.map((item) => (
                     <Link
                       key={item._id}
-                      // THIS IS THE KEY: Dynamic link to the specific product
                       to={`/product/${item._id}`}
                       onClick={() => {
                         setShowDropdown(false);
@@ -419,21 +447,29 @@ const Header = () => {
                       }}
                       className="flex items-center gap-3 p-2 hover:bg-pink-50 rounded-lg transition"
                     >
-                      <img 
-                        src={item.image ? `${API}${item.image}` : "/placeholder.png"} 
-                        alt={item.name} 
+                      <img
+                        src={item.image ? `${API}${item.image}` : "/placeholder.png"}
+                        alt={item.name}
                         className="w-10 h-10 object-cover rounded shadow-sm"
-                        onError={(e) => { e.target.src = "/placeholder.png"; }}
+                        onError={(e) => (e.target.src = "/placeholder.png")}
                       />
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-800">{item.name}</span>
-                        {item.price && <span className="text-xs text-pink-500 font-bold">₹{item.price}</span>}
+                        <span className="text-sm font-medium text-gray-800">
+                          {item.name}
+                        </span>
+                        {item.price && (
+                          <span className="text-xs text-pink-500 font-bold">
+                            ₹{item.price}
+                          </span>
+                        )}
                       </div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="p-4 text-center text-sm text-gray-400">No products found</div>
+                <div className="p-4 text-center text-sm text-gray-400">
+                  No products found
+                </div>
               )}
             </div>
           )}
@@ -443,9 +479,13 @@ const Header = () => {
         <div className="flex items-center gap-7 flex-shrink-0">
           {!isLoggedIn ? (
             <div className="flex items-center text-sm font-semibold gap-3">
-              <Link to="/login" className="text-gray-600 hover:text-pink-600 transition">Login</Link>
+              <Link to="/login" className="text-gray-600 hover:text-pink-600 transition">
+                Login
+              </Link>
               <span className="text-gray-400">|</span>
-              <Link to="/register" className="text-gray-600 hover:text-pink-600 transition">Register</Link>
+              <Link to="/register" className="text-gray-600 hover:text-pink-600 transition">
+                Register
+              </Link>
             </div>
           ) : (
             <Link to="/profile" className="text-black hover:text-pink-600 transition">
@@ -455,7 +495,10 @@ const Header = () => {
 
           <div className="flex items-center gap-5">
             <Link to="/favorites" className="relative">
-              <Heart className="w-6 h-6 cursor-pointer transition-all duration-200" style={{ color: favorites.length > 0 ? primaryPink : "black" }} />
+              <Heart
+                className="w-6 h-6 cursor-pointer"
+                style={{ color: favorites.length > 0 ? primaryPink : "black" }}
+              />
               {favorites.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                   {favorites.length}
@@ -464,10 +507,13 @@ const Header = () => {
             </Link>
 
             <div className="relative cursor-pointer" onClick={() => setIsCartOpen(true)}>
-              <ShoppingCart className="w-6 h-6 transition-all duration-200" style={{ color: cart.length > 0 ? secondaryPink : "black" }} />
+              <ShoppingCart
+                className="w-6 h-6"
+                style={{ color: cart.length > 0 ? secondaryPink : "black" }}
+              />
               {cart.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-pink-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white">
-                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                  {cart.reduce((t, i) => t + i.quantity, 0)}
                 </span>
               )}
             </div>

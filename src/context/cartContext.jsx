@@ -164,7 +164,6 @@
 //   );
 // };
 
-
 import React, {
   createContext,
   useContext,
@@ -182,19 +181,31 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Helper to get headers (Internal use)
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  };
+
   // ================= FETCH CART =================
   const fetchCart = useCallback(async () => {
+    const localCakes = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      // If no token, we only show local storage items
+      setCart(localCakes);
+      return;
+    }
+
     try {
-      const res = await axiosClient.get("/cart");
+      const res = await axiosClient.get("/cart", getAuthHeaders());
       const serverCart = Array.isArray(res.data) ? res.data : [];
-      
-      // Preserve local CustomCakes when syncing with server
-      setCart(prev => {
-        const localItems = prev.filter(item => item.itemType === "CustomCake");
-        return [...serverCart, ...localItems];
-      });
+      setCart([...serverCart, ...localCakes]);
     } catch (err) {
-      if (err.response?.status === 401) setCart([]);
+      if (err.response?.status === 401) {
+        setCart(localCakes);
+      }
     }
   }, []);
 
@@ -214,7 +225,17 @@ export const CartProvider = ({ children }) => {
   ) => {
     if (!itemId) return toast.error("Item missing");
 
-    // Optimistic Update: Add to UI immediately
+    const cartItemData = {
+      product: itemId,
+      selectedSize,
+      quantity,
+      price,
+      name,
+      itemType,
+      image,
+    };
+
+    // Optimistic UI Update
     setCart(prev => {
       const existing = prev.find(
         i =>
@@ -232,26 +253,15 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-
-      return [
-        ...prev,
-        {
-          product: itemId,
-          selectedSize,
-          quantity,
-          price,
-          name,
-          itemType,
-          image,
-        },
-      ];
+      return [...prev, cartItemData];
     });
 
-    // Bypassing backend for CustomCakes to avoid 400/500 errors
     if (itemType === "CustomCake") {
+      const existingLocal = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
+      localStorage.setItem("local_custom_cakes", JSON.stringify([...existingLocal, cartItemData]));
       setIsCartOpen(true);
       toast.success("Added to cart!");
-      return; // Stop here for frontend-only items
+      return; 
     }
 
     try {
@@ -260,7 +270,7 @@ export const CartProvider = ({ children }) => {
         itemType,
         size: selectedSize,
         quantity,
-      });
+      }, getAuthHeaders());
       await fetchCart();
       setIsCartOpen(true);
     } catch {
@@ -269,29 +279,28 @@ export const CartProvider = ({ children }) => {
   };
 
   // ================= QUANTITY =================
-  const updateQuantity = async (
-    itemId,
-    size = "",
-    newQuantity,
-    itemType
-  ) => {
+  const updateQuantity = async (itemId, size = "", newQuantity, itemType) => {
     if (newQuantity < 1) return;
 
     setCart(prev =>
       prev.map(item => {
         const id = item.product?._id || item.product;
-        if (
-          id === itemId &&
-          (item.selectedSize || "") === size &&
-          item.itemType === itemType
-        ) {
+        if (id === itemId && (item.selectedSize || "") === size && item.itemType === itemType) {
           return { ...item, quantity: newQuantity };
         }
         return item;
       })
     );
 
-    if (itemType === "CustomCake") return; // Stop here for local items
+    if (itemType === "CustomCake") {
+      const existingLocal = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
+      const updatedLocal = existingLocal.map(item => 
+        (item.product === itemId && item.selectedSize === size) 
+        ? { ...item, quantity: newQuantity } : item
+      );
+      localStorage.setItem("local_custom_cakes", JSON.stringify(updatedLocal));
+      return;
+    }
 
     try {
       await axiosClient.post("/cart/add", {
@@ -300,7 +309,7 @@ export const CartProvider = ({ children }) => {
         size,
         quantity: newQuantity,
         replace: true,
-      });
+      }, getAuthHeaders());
       await fetchCart();
     } catch {
       fetchCart();
@@ -312,25 +321,42 @@ export const CartProvider = ({ children }) => {
     setCart(prev =>
       prev.filter(item => {
         const id = item.product?._id || item.product;
-        return !(
-          id === itemId &&
-          (item.selectedSize || "") === size &&
-          item.itemType === itemType
-        );
+        return !(id === itemId && (item.selectedSize || "") === size && item.itemType === itemType);
       })
     );
 
-    if (itemType === "CustomCake") return; // Stop here for local items
+    if (itemType === "CustomCake") {
+      const existingLocal = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
+      const filteredLocal = existingLocal.filter(item => 
+        !(item.product === itemId && item.selectedSize === size)
+      );
+      localStorage.setItem("local_custom_cakes", JSON.stringify(filteredLocal));
+      return;
+    }
 
     try {
       await axiosClient.delete(
-        `/cart/remove/${itemId}/${itemType}?size=${encodeURIComponent(
-          size || ""
-        )}`
+        `/cart/remove/${itemId}/${itemType}?size=${encodeURIComponent(size || "")}`,
+        getAuthHeaders()
       );
       await fetchCart();
     } catch {
       fetchCart();
+    }
+  };
+
+  // ================= CLEAR CART =================
+  const clearCart = async () => {
+    setCart([]); 
+    localStorage.removeItem("local_custom_cakes"); 
+    
+    const token = localStorage.getItem("token");
+    if (!token) return; // Silent return if guest
+
+    try {
+      await axiosClient.delete("/cart/clear", getAuthHeaders()); 
+    } catch (err) {
+      console.error("Cart clear error", err);
     }
   };
 
@@ -344,6 +370,7 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         removeFromCart,
         fetchCart,
+        clearCart,
       }}
     >
       {children}

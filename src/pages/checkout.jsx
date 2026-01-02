@@ -293,85 +293,68 @@ const Checkout = () => {
   };
 
   // --- UPDATED LOGIC START ---
-  const handleConfirmOrder = async () => {
-    if (!firstName || !lastName || !address || !phone) {
-      alert("Please fill all shipping details.");
-      return;
-    }
-    if (!deliveryDate) {
-      alert("Please select delivery date.");
-      return;
-    }
-    if (subtotal <= 0) {
-      alert("Cart is empty or subtotal is invalid.");
-      return;
-    }
+ const handleConfirmOrder = async () => {
+  if (!firstName || !lastName || !address || !phone || !deliveryDate) {
+    alert("Please fill all required details.");
+    return;
+  }
 
-    const orderData = {
-      items: displayItems.map(item => ({
-        productId: item._id || item.id,
-        name: item.name,
-        qty: item.quantity,
-        price: item.price,
-        selectedSize: item.selectedSize || null,
-      })),
-      subtotal,
-      shipping: shippingCharge,
-      total,
-      address: `${firstName} ${lastName}, ${address}`,
-      phone,
-      email,
-      scheduleDate: deliveryDate,
-      scheduleTime: selectedSlot,
-      paymentMethod
-    };
-
-    setLoading(true);
-
-    try {
-      // Call backend to create order and get payment details
-      const res = await axios.post(
-        "http://localhost:5006/api/payment/esewa/initiate",
-        orderData
-      );
-
-      if (paymentMethod === "E-Sewa") {
-        const { esewaFormData } = res.data;
-
-        if (!esewaFormData || !esewaFormData.signature) {
-          alert("Payment initiation failed: Missing signature from server.");
-          return;
-        }
-
-        // Create dynamic form for eSewa v2 (RC)
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
-
-        // Map all fields (amount, signature, transaction_uuid, etc.)
-        Object.keys(esewaFormData).forEach((key) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = esewaFormData[key];
-          form.appendChild(input);
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-
-      } else {
-        // Handle COD or other methods
-        clearCart(); 
-        navigate("/payment-success"); 
-      }
-    } catch (err) {
-      console.error("Order error:", err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const orderData = {
+    items: displayItems.map(item => ({
+      productId: item._id || item.id,
+      name: item.name,
+      qty: item.quantity,
+      price: item.price,
+      selectedSize: item.selectedSize || null,
+    })),
+    subtotal,
+    shipping: shippingCharge,
+    total,
+    address: `${firstName} ${lastName}, ${address}`,
+    phone,
+    email,
+    scheduleDate: deliveryDate,
+    scheduleTime: selectedSlot,
+    paymentMethod
   };
+
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token"); // GET TOKEN
+    const res = await axios.post(
+      "http://localhost:5006/api/payment/esewa/initiate",
+      orderData,
+      {
+        headers: { Authorization: `Bearer ${token}` } // SEND TOKEN
+      }
+    );
+
+    if (paymentMethod === "E-Sewa") {
+      const { esewaFormData } = res.data;
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+
+      Object.keys(esewaFormData).forEach((key) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = esewaFormData[key];
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      await clearCart(); 
+      navigate("/payment-success"); 
+    }
+  } catch (err) {
+    console.error("Order error:", err);
+    alert("Order failed. Please check if you are logged in.");
+  } finally {
+    setLoading(false);
+  }
+};
   // --- UPDATED LOGIC END ---
 
   return (

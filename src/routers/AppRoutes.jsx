@@ -95,6 +95,7 @@ import Checkout from "../pages/checkout";
 import ProductDetailsPage from "../pages/productDetailPage";
 import PaymentSuccess from "../pages/paymentsuccess";
 import PaymentFailed from "../pages/paymentfailure";
+import OrderDetails from "../pages/orderDetailPage";
 
 // ✅ new user page
 
@@ -145,6 +146,7 @@ export default function AppRoutes() {
 
       <Route path="/preview/:id" element={<CakePreview />} />
       <Route path="/product/:productId" element={<ProductDetailsPage />} />
+      <Route path="/order-details/:id" element={<OrderDetails />} />
 
 
 
