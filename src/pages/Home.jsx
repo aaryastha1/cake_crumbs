@@ -1,5 +1,6 @@
 // Home.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import useAuth from "../hooks/useAuth"; // For auth info
@@ -43,6 +44,7 @@ const bestSellerCardStyle = {
 
 export default function Home() {
   const { user } = useAuth(); // Get logged-in user info
+  const navigate = useNavigate(); // Initialize navigation
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0); // For hero carousel
@@ -199,54 +201,84 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CUSTOM ORDER SECTION */}
-        <section className="py-10" style={{ backgroundColor: bestSellersBgColor }}>
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-start justify-between">
-            {/* TEXT */}
-            <div className="md:w-1/2 mb-6 md:mb-0 text-left md:pr-16 md:ml-8mt-4">
+        {/* CUSTOM ORDER SECTION - Professional Studio Look */}
+        <section className="py-24 relative overflow-hidden" style={{ backgroundColor: "#FDF7F8" }}>
+          {/* Soft background light effect */}
+          <div className="absolute top-0 right-0 w-[50%] h-full bg-[#F7E7EB] rounded-l-[100px] -z-0"></div>
+
+          <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center justify-between relative z-10">
+            
+            {/* LEFT COLUMN: ELEGANT TEXT */}
+            <div className="lg:w-[45%] mb-16 lg:mb-0 text-left">
               <h2
                 className="mb-6"
                 style={{
                   color: secondaryPink,
                   fontFamily: "'Great Vibes', cursive",
-                  fontWeight: "700",
-                  fontSize: "3rem",
-                  lineHeight: "1.1",
+                  fontWeight: "500", // Adjusted to match your "bigger/bold" request
+                  fontSize: "4rem", // Adjusted to match your "bigger/bold" request
+                  lineHeight: "1.0",
                 }}
               >
                 Special Orders
               </h2>
 
               <p
-                className="text-lg mb-10 leading-relaxed"
+                className="mb-10 leading-relaxed max-w-lg" // Adjusted to match your "bigger/bold" request
                 style={{
                   fontFamily: "'Dancing Script', cursive",
-                  color: "#555",
+                  color: "#333", // Darker for better visibility
+                  fontSize: "1.75rem", // Bigger
+                  fontWeight: "400", // Bold
                 }}
               >
-                Create the perfect cake for your celebration with our custom designs.
-                From elegant minimalist styles to charming pedal creations, every cake
-                is handcrafted with delicious details, smooth frosting, and personalized
-                touches like ribbons, pearls, and fondant toppers.
+                Your celebration deserves a centerpiece as unique as your story. 
+                Each cake is a handcrafted masterpiece, designed in our 3D studio 
+                with delicate pearls, silk ribbons, and artistic floral arrangements.
               </p>
 
               <button
-                className="text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-[1.03]"
-                style={{ background: primaryPink }}
+                onClick={() => navigate("/customize-cake")} // Action: Navigate to customize-cake
+                className="group bg-[#2D3E50] text-white font-bold py-4 px-12 rounded-xl shadow-2xl transition-all hover:bg-pink-500 hover:scale-105 active:scale-95 flex items-center gap-4"
               >
-                Customize Now
+                <span className="uppercase tracking-widest text-[11px]">Start Designing</span>
+                <div className="w-6 h-[1px] bg-white/50 group-hover:w-10 transition-all"></div>
               </button>
             </div>
 
-            {/* IMAGE */}
-            <div className="md:w-1/2">
-              <img
-                src={`http://localhost:5006${customSection.image}`}
-                alt="Custom Cake"
-                className="rounded-2xl shadow-2xl w-full max-w-sm ml-auto object-cover aspect-[3/4]"
-                style={{ boxShadow: "0 15px 30px rgba(178, 58, 126, 0.2)" }}
-              />
+            {/* RIGHT COLUMN: THE STUDIO PHOTO WITH DEEP CURVES */}
+            <div className="lg:w-[50%] flex justify-center lg:justify-end">
+              <div className="relative group">
+                
+                {/* Image container */}
+                <div className="relative z-10 p-4 bg-white rounded-[60px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] transition-transform duration-1000 ease-out group-hover:scale-[1.02]">
+                  <img
+                    src={`http://localhost:5006${customSection.image}`}
+                    alt="Custom 3D Cake Design"
+                    className="w-full max-w-lg rounded-[50px] object-cover aspect-[4/5]"
+                    style={{ 
+                        border: "1px solid rgba(0,0,0,0.05)"
+                    }}
+                  />
+                  
+                  {/* Subtle "Studio Information" Overlay */}
+                  <div className="absolute bottom-10 left-10 right-10 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                     <div className="bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/30 text-[#2D3E50]">
+                        <p className="text-[8px] uppercase font-black tracking-widest opacity-70">Texture</p>
+                        <p className="text-xs font-bold">Silk Buttercream</p>
+                     </div>
+                     <div className="bg-white p-3 rounded-2xl shadow-lg">
+                        <p className="text-[10px] font-black text-pink-500 uppercase">360° View</p>
+                     </div>
+                  </div>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-200/20 blur-3xl rounded-full"></div>
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/50 blur-3xl rounded-full"></div>
+              </div>
             </div>
+
           </div>
         </section>
       </main>

@@ -93,6 +93,8 @@ import FavoritesPage from "../pages/favoritepage";
 import CakePreview from "../pages/cakepreview";
 import Checkout from "../pages/checkout";
 import ProductDetailsPage from "../pages/productDetailPage";
+import PaymentSuccess from "../pages/paymentsuccess";
+import PaymentFailed from "../pages/paymentfailure";
 
 // ✅ new user page
 
@@ -134,18 +136,20 @@ export default function AppRoutes() {
       <Route path="/bakeries" element={<BakeryProducts />} />             {/* All bakeries */}
       <Route path="/bakeries/:categoryId" element={<BakeryProducts />} /> {/* Filtered by category */}
       <Route path="/profile" element={<Profile />} />
-      <Route path="/favorites" element= {<FavoritesPage/>}/>
+      <Route path="/favorites" element={<FavoritesPage />} />
       <Route path="/cake-preview" element={<CakePreview />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-failed" element={<PaymentFailed />} />
 
       <Route path="/checkout" element={<Checkout />} />
-   
-<Route path="/preview/:id" element={<CakePreview />} />
-<Route path="/product/:productId" element={<ProductDetailsPage />} />
 
-      
-      
+      <Route path="/preview/:id" element={<CakePreview />} />
+      <Route path="/product/:productId" element={<ProductDetailsPage />} />
 
-      
+
+
+
+
 
 
 

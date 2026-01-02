@@ -222,6 +222,8 @@ const PasswordInput = ({ label, value, onChange }) => (
         <input
             type="password"
             value={value}
+            // "new-password" prevents the browser from trying to find an email field to pair with this
+            autoComplete="new-password" 
             onChange={(e) => onChange(e.target.value)}
             className="w-full bg-[#FFF1F2]/40 border-2 border-rose-50 rounded-2xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-200 outline-none transition-all"
         />
