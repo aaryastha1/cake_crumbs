@@ -59,8 +59,6 @@
 // }
 
 
-
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -79,10 +77,10 @@ import AdminProducts from "../pages/admin/adminProduct";
 import AddProduct from "../pages/admin/addproduct";
 import ViewProduct from "../pages/admin/adminviewproduct";
 import EditProduct from "../pages/admin/admineditProduct";
-import AdminOrders from "../pages/admin/adminOrder"; // ✅ new Admin page
+import AdminOrders from "../pages/admin/adminOrder";
 import AdminBakery from "../pages/admin/adminBakery";
 
-// Frontend (user) pages
+// Frontend pages
 import OccasionProducts from "../pages/OccasionProducts";
 import CakeDetails from "../pages/CakeDetails";
 import AboutUs from "../pages/aboutUs";
@@ -97,10 +95,11 @@ import PaymentSuccess from "../pages/paymentsuccess";
 import PaymentFailed from "../pages/paymentfailure";
 import OrderDetails from "../pages/orderDetailPage";
 
-// ✅ new user page
-
 // Admin layout
 import AdminLayout from "../layouts/adminLayout";
+
+// Private Admin Route
+import PrivateAdminRoute from "../routers/privateAdminRoutes";
 
 export default function AppRoutes() {
   return (
@@ -109,52 +108,40 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
 
-      {/* Admin Routes (WITH SIDEBAR) */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="preview-cake" element={<CakePreviewPage />} />
-        <Route path="customizes" element={<AdminCustomizes />} />
-        <Route path="categories" element={<AdminCategories />} />
-        <Route path="categories/add" element={<CreateCategory />} />
-        <Route path="products" element={<AdminProducts />} />
-        <Route path="products/add" element={<AddProduct />} />
-        <Route path="products/view/:id" element={<ViewProduct />} />
-        <Route path="products/edit/:id" element={<EditProduct />} />
-        <Route path="orders" element={<AdminOrders />} /> {/* ✅ Admin Orders page */}
-        <Route path="bakery" element={<AdminBakery />} />
-
+      {/* Protected Admin Routes */}
+      <Route path="/admin" element={<PrivateAdminRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="preview-cake" element={<CakePreviewPage />} />
+          <Route path="customizes" element={<AdminCustomizes />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="categories/add" element={<CreateCategory />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="products/add" element={<AddProduct />} />
+          <Route path="products/view/:id" element={<ViewProduct />} />
+          <Route path="products/edit/:id" element={<EditProduct />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="bakery" element={<AdminBakery />} />
+        </Route>
       </Route>
 
-      {/* User Frontend Routes */}
+      {/* Frontend (user) Routes */}
       <Route path="/occasions/:occasionId" element={<OccasionProducts />} />
       <Route path="/products/:productId" element={<CakeDetails />} />
-      <Route path="/customize" element={<AdminCustomizes />} /> {/* ✅ User Customize Cake page */}
+      <Route path="/customize" element={<AdminCustomizes />} />
       <Route path="/about-us" element={<AboutUs />} />
-
-
       <Route path="/customize-cake" element={<UserCustomizes />} />
-
-      <Route path="/bakeries" element={<BakeryProducts />} />             {/* All bakeries */}
-      <Route path="/bakeries/:categoryId" element={<BakeryProducts />} /> {/* Filtered by category */}
+      <Route path="/bakeries" element={<BakeryProducts />} />
+      <Route path="/bakeries/:categoryId" element={<BakeryProducts />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/favorites" element={<FavoritesPage />} />
       <Route path="/cake-preview" element={<CakePreview />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/payment-failed" element={<PaymentFailed />} />
-
       <Route path="/checkout" element={<Checkout />} />
-
       <Route path="/preview/:id" element={<CakePreview />} />
       <Route path="/product/:productId" element={<ProductDetailsPage />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
-
-
-
-
-
-
-
-
 
       {/* Home / fallback */}
       <Route path="*" element={<Home />} />
