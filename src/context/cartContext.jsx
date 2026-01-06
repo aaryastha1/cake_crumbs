@@ -317,33 +317,30 @@ export const CartProvider = ({ children }) => {
   };
 
   // ================= REMOVE =================
-  const removeFromCart = async (itemId, size = "", itemType) => {
-    setCart(prev =>
-      prev.filter(item => {
-        const id = item.product?._id || item.product;
-        return !(id === itemId && (item.selectedSize || "") === size && item.itemType === itemType);
-      })
-    );
+ const removeFromCart = async (itemId, size = "", itemType) => {
+  // 1. Update UI immediately (Optimistic)
+  setCart(prev => prev.filter(item => {
+    const id = item.productId || item.product?._id || item.product;
+    return !(id === itemId && (item.selectedSize || "") === size && item.itemType === itemType);
+  }));
 
-    if (itemType === "CustomCake") {
-      const existingLocal = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
-      const filteredLocal = existingLocal.filter(item => 
-        !(item.product === itemId && item.selectedSize === size)
-      );
-      localStorage.setItem("local_custom_cakes", JSON.stringify(filteredLocal));
-      return;
-    }
+  // 2. Handle Local Storage (Custom Cakes)
+  if (itemType === "CustomCake") {
+    const local = JSON.parse(localStorage.getItem("local_custom_cakes") || "[]");
+    localStorage.setItem("local_custom_cakes", JSON.stringify(local.filter(i => i.product !== itemId)));
+    return;
+  }
 
-    try {
-      await axiosClient.delete(
-        `/cart/remove/${itemId}/${itemType}?size=${encodeURIComponent(size || "")}`,
-        getAuthHeaders()
-      );
-      await fetchCart();
-    } catch {
-      fetchCart();
-    }
-  };
+  // 3. Handle Backend
+  try {
+    // Ensure itemId is not undefined here
+    await axiosClient.delete(`/cart/remove/${itemId}/${itemType}?size=${encodeURIComponent(size)}`, getAuthHeaders());
+    await fetchCart(); // Sync with server
+  } catch (err) {
+    console.error("Delete failed", err);
+    fetchCart();
+  }
+};
 
   // ================= CLEAR CART =================
   const clearCart = async () => {

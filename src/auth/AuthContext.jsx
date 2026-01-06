@@ -7,8 +7,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-
-  // Load initial state from storage
   useEffect(() => {
     try {
       const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -21,17 +19,15 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Update logic: Immediate persistence
+
   const login = (userData, tokenData) => {
-    // 1. Update Storage IMMEDIATELY so axios interceptor sees it
+   
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("token", tokenData);
-
-    // 2. Update State for UI
     setUser(userData);
     setToken(tokenData);
     
-    // Note: navigate is moved to the Login component for better control
+ 
   };
 
   const logout = () => {

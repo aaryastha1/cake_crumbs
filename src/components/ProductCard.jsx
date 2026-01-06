@@ -1,4 +1,4 @@
-// src/components/ProductCard.jsx
+
 import React from "react";
 import { Heart } from "lucide-react";
 import { useFavorites } from "../pages/favoriteContext";
@@ -13,7 +13,6 @@ const ProductCard = ({ product }) => {
       <h3>{product.name}</h3>
       <p>{product.description}</p>
 
-      {/* Heart button for favorite */}
       <button onClick={() => toggleFavorite(product._id)}>
         <Heart color={isFavorite ? "red" : "gray"} />
       </button>

@@ -1,76 +1,92 @@
-// Footer.js
 import React from "react";
-// Assuming you have configured 'font-serif-tnr' in your tailwind.config.js
+import { MapPin, Phone, Mail, Facebook, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    // Set the overall font and background
-    <footer className="w-full bg-white p-6 mt-10 border-t border-gray-100 font-serif-tnr">
-      
-      {/* Container for content, centered and max-width for less "wide" feel */}
-      <div className="flex justify-between items-start max-w-6xl mx-auto py-4">
-        
-        {/* --- Visit Us Section (Left Side) --- */}
-        <div className="text-gray-700">
-          <h3 className="text-xl font-bold mb-2">Visit Us</h3>
-          
-          {/* Location */}
-          <div className="flex items-center text-sm mb-1">
-            <span className="mr-2 text-pink-600">📍</span>
-            <p className="m-0">Koteshwor, Kathmandu</p>
+    <footer className="w-full bg-pink-50 text-pink-900 font-sans border-t border-pink-100">
+
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+
+          <div className="space-y-3 md:pl-17">
+            <h3 className="text-xs font-bold uppercase tracking-wider">
+              Cake and Crumbs
+            </h3>
+            <p className="text-xs leading-relaxed text-pink-800/70">
+             Crafting sweet memories since 2010. Every bite tells a story of passion, quality, and love.
+            </p>
           </div>
-          
-          {/* Contact Number */}
-          <div className="flex items-center text-sm">
-            <span className="mr-2 text-pink-600">📞</span>
-            <p className="m-0">505-418-0415</p>
+
+          <div className="space-y-3 md:pl-24">
+            <h3 className="text-xs font-bold uppercase tracking-wider">
+              Quick Links
+            </h3>
+            <ul className="space-y-1.5 text-xs text-pink-800/80">
+              <li><Link to="/" className="hover:text-pink-600 transition">Home</Link></li>
+              <li><Link to="/services" className="hover:text-pink-600 transition">Services</Link></li>
+              <li><Link to="/about-us" className="hover:text-pink-600 transition">About</Link></li>
+
+            </ul>
           </div>
-        </div>
-        
-        {/* --- Follow Us Section (Right Side) --- */}
-        <div className="flex flex-col items-end text-sm">
-          <p className="mb-2 text-gray-700">Follow Us</p>
-          
-          {/* Social Media Icons */}
-          <div className="flex gap-3">
-            {/* Facebook Icon */}
-            <a 
-              href="#facebook" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition"
-            >
-              {/* Using a placeholder image for the Facebook icon as shown in the UI */}
-              <img 
-                src="https://img.icons8.com/ios-filled/24/100052/facebook-new.png" 
-                alt="Facebook" 
-                className="w-6 h-6"
-              />
-            </a>
-            
-            {/* Instagram Icon */}
-            <a 
-              href="#instagram" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition"
-            >
-              {/* Using a placeholder image for the Instagram icon as shown in the UI */}
-              <img 
-                src="https://img.icons8.com/ios-filled/24/100052/instagram-new.png" 
-                alt="Instagram" 
-                className="w-6 h-6"
-              />
-            </a>
+
+          <div className="space-y-3 md:pl-23">
+            <h3 className="text-xs font-bold uppercase tracking-wider">
+              Visit Us
+            </h3>
+            <div className="space-y-2 text-xs text-pink-800/80">
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-pink-600" />
+                <span>Koteshwor, Kathmandu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone size={14} className="text-pink-600" />
+                <span>505-418-0415</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-pink-600" />
+                <a
+                  href="mailto:cakeandcrumbs@gmail.com"
+                  className="text-pink-800/80 hover:text-pink-600 transition"
+                >
+                  cakeandcrumbs@gmail.com
+                </a>
+              </div>
+
+            </div>
           </div>
+
+
+          <div className="space-y-3 ">
+            <h3 className="text-xs font-bold uppercase tracking-wider">
+              Follow Us
+            </h3>
+            <div className="flex gap-3">
+              <a
+                href="#"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-pink-600 shadow-sm hover:bg-pink-600 hover:text-white transition"
+              >
+                <Facebook size={16} />
+              </a>
+              <a
+                href="#"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-pink-600 shadow-sm hover:bg-pink-600 hover:text-white transition"
+              >
+                <Instagram size={16} />
+              </a>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      {/* Optional: Add Copyright below the main content if needed for completeness */}
-      {/* <div className="text-center text-gray-500 text-xs mt-4 border-t pt-2 border-gray-100 max-w-6xl mx-auto">
-        &copy; {new Date().getFullYear()} Cakes & Crumbs. All rights reserved.
-      </div> */}
-      
+
+      <div className="border-t border-pink-200 py-4 text-center text-[10px] text-pink-400 tracking-widest uppercase">
+        © 2026 All rights reserved.
+      </div>
     </footer>
   );
 };

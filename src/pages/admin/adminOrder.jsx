@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaTimes } from 'react-icons/fa'; // Ensure react-icons is installed
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  // NEW STATE: For the photo viewer
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const BACKEND_URL = "http://localhost:5006";
 
@@ -25,15 +28,11 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
-  // Updated Image Normalizer
   const getNormalizedUrl = (url) => {
     if (!url) return null;
     if (url.startsWith("data:image") || url.startsWith("http")) return url;
-    
-    // Fix Windows backslashes and double slashes
     let cleanPath = url.replace(/\\/g, "/").replace(/\/+/g, "/");
     if (cleanPath.startsWith("/")) cleanPath = cleanPath.substring(1);
-    
     return `${BACKEND_URL}/${cleanPath}`;
   };
 
@@ -60,7 +59,7 @@ const AdminOrders = () => {
                 <th className="p-5">Customer</th>
                 <th className="p-5">Items & Photos</th>
                 <th className="p-5">Total</th>
-                <th className="p-5">Payment Status</th>
+                <th className="p-5">Status</th>
                 <th className="p-5">Schedule</th>
               </tr>
             </thead>
@@ -78,15 +77,18 @@ const AdminOrders = () => {
                   </td>
 
                   <td className="p-5">
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {order.items && order.items.map((item, i) => {
-                        // FIX: Use 'product' as key to match your backend model
-                        const itemName = item.name || (item.product && item.product.name) || "Product";
-                        const itemImg = item.image || (item.product && item.product.image);
-                        const fullImgUrl = getNormalizedUrl(itemImg);
+                        const itemName = item.name || "Unknown Product";
+                        const fullImgUrl = getNormalizedUrl(item.image);
 
                         return (
-                          <div key={i} className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm w-max min-w-[220px]">
+                          <div 
+                            key={i} 
+                            // CLICK HANDLER ADDED HERE
+                            onClick={() => setSelectedItem(item)}
+                            className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm w-max min-w-[220px] cursor-pointer hover:border-blue-300 transition-all"
+                          >
                             <div className="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative">
                               {fullImgUrl ? (
                                 <img 
@@ -107,11 +109,13 @@ const AdminOrders = () => {
                               </div>
                             </div>
                             <div>
-                              <p className="font-bold text-slate-800 text-[10px] uppercase">{itemName}</p>
-                              {/* FIX: Ensure we use 'quantity' which is saved by the backend */}
+                              <p className="font-bold text-slate-800 text-[10px] uppercase leading-tight">{itemName}</p>
                               <p className="text-slate-500 text-[9px]">
-                                QTY: {item.quantity || item.qty || 1} {item.size || item.selectedSize ? `(${item.size || item.selectedSize})` : ""}
+                                QTY: {item.quantity} {item.size ? `(${item.size})` : ""}
                               </p>
+                              {item.notes && (
+                                <p className="text-blue-500 text-[8px] mt-1 italic leading-tight truncate w-32">Note: {item.notes}</p>
+                              )}
                             </div>
                           </div>
                         );
@@ -141,6 +145,65 @@ const AdminOrders = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* --- PHOTO VIEWER MODAL --- */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden relative shadow-2xl animate-in fade-in zoom-in duration-200">
+            {/* Close Button */}
+            <button 
+              onClick={() => setSelectedItem(null)}
+              className="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-rose-500 hover:text-white transition-colors z-10"
+            >
+              <FaTimes size={20} />
+            </button>
+
+            {/* Large Image */}
+            <div className="w-full h-80 bg-slate-100">
+              <img 
+                src={getNormalizedUrl(selectedItem.image)} 
+                className="w-full h-full object-cover"
+                alt="Product View"
+              />
+            </div>
+
+            {/* Content Details */}
+            <div className="p-8">
+              <h2 className="text-2xl font-black text-slate-800 uppercase mb-2">
+                {selectedItem.name}
+              </h2>
+              
+              <div className="flex gap-4 mb-6">
+                <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Quantity</p>
+                  <p className="text-lg font-black text-slate-800">x{selectedItem.quantity}</p>
+                </div>
+                {selectedItem.size && (
+                  <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">Size</p>
+                    <p className="text-lg font-black text-slate-800">{selectedItem.size}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Notes Box */}
+              <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Customer Notes</h3>
+                <p className="text-slate-700 text-sm italic leading-relaxed">
+                  {selectedItem.notes || "No extra instructions provided."}
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedItem(null)}
+                className="w-full mt-6 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-800 transition-colors"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

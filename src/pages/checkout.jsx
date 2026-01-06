@@ -257,6 +257,8 @@ const Checkout = () => {
   const buyNowProduct = location.state?.buyNowProduct;
   const displayItems = buyNowProduct ? [buyNowProduct] : cart;
 
+  
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
@@ -309,15 +311,17 @@ const Checkout = () => {
     }
 
     // 2. Prepare Data (Match Backend Expectations exactly)
-    const orderData = {
-      items: displayItems.map((item) => ({
-        productId: item._id || item.id,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        image: item.image,
-        selectedSize: item.selectedSize || null,
-      })),
+   const orderData = {
+    items: displayItems.map((item) => ({
+      // Ensure we are grabbing the correct name and ID
+      productId: item.productId || item._id || item.id,
+      name: item.name || (item.item && item.item.name), 
+      quantity: item.quantity,
+      price: item.price,
+      // Pass the relative path if possible
+      image: item.image?.replace("http://localhost:5006/", "") || "",
+      selectedSize: item.selectedSize || null,
+    })),
       subtotal,
       shipping: shippingCharge,
       total,

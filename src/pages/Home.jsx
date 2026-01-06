@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import useAuth from "../hooks/useAuth"; // For auth info
 
-// --- Design Constants ---
+
 const primaryPink = "#ff4c8a"; // Button pink
 const secondaryPink = "#b23a7e"; // Heading pink
 
@@ -129,11 +129,14 @@ export default function Home() {
                 Perfect for birthdays, get-togethers, or simply moments delivered fresh across Kathmandu.
               </p>
               <button
-                className="text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-[1.03]"
-                style={{ background: primaryPink }}
-              >
-                Order Now
-              </button>
+  onClick={() => navigate("/occasions/all")} // Go to Occasions page and select "All"
+  className="text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-[1.03]"
+  style={{ background: primaryPink }}
+>
+  Order Now
+</button>
+
+
             </div>
           </div>
 
@@ -188,7 +191,7 @@ export default function Home() {
               ))}
             </div>
 
-            <button
+            {/* <button
               className="mt-12 text-sm font-semibold px-6 py-2 rounded-full transition-colors"
               style={{
                 backgroundColor: "#FFFFFF",
@@ -197,7 +200,7 @@ export default function Home() {
               }}
             >
               See More
-            </button>
+            </button> */}
           </div>
         </section>
 
