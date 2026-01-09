@@ -47,7 +47,8 @@ export default function Home() {
   const navigate = useNavigate(); // Initialize navigation
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0); // For hero carousel
+  const [currentSlide, setCurrentSlide] = useState(0)
+  ; // For hero carousel
 
   useEffect(() => {
     fetch("http://localhost:5006/api/home")
