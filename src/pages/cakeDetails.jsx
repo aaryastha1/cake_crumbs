@@ -67,10 +67,10 @@
 //     const sizeName = selectedSizeObject.size || "Standard";
 //     // 1. Add to cart first
 //     await addToCart(product._id, sizeName, quantity, "Product", cakeMessage);
-    
+
 //     // 2. Explicitly close the cart drawer so it doesn't pop up
 //     if (setIsCartOpen) setIsCartOpen(false);
-    
+
 //     // 3. Navigate directly to checkout
 //     navigate("/checkout");
 //   };
@@ -89,7 +89,7 @@
 //       {/* Main Modal Overlay */}
 //       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-[1px] p-4">
 //         <div className="bg-white w-full max-w-3xl rounded-[1.5rem] overflow-hidden flex flex-col md:flex-row shadow-2xl relative animate-in fade-in zoom-in duration-300">
-          
+
 //           {/* Close Button */}
 //           <button 
 //             onClick={() => navigate(-1)}
@@ -215,6 +215,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useCart } from "../context/cartContext";
 import { Heart, Loader2, Minus, Plus, ShoppingBag, ChevronRight } from "lucide-react";
+import StarRating from "../components/StarRating";
+
 
 const CakeDetails = () => {
   const { productId } = useParams();
@@ -227,6 +229,13 @@ const CakeDetails = () => {
   const [selectedFlavor, setSelectedFlavor] = useState('');
   const [cakeMessage, setCakeMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
+
+  // ⭐ Reviews & Ratings (ADDED)
+  const [reviews, setReviews] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
+  const [userRating, setUserRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+
 
   const API = import.meta.env.VITE_API_URL || "http://localhost:5006";
 
@@ -255,6 +264,58 @@ const CakeDetails = () => {
     window.scrollTo(0, 0);
   }, [productId, API]);
 
+  // ⭐ Fetch reviews (ADDED)
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(`${API}/api/reviews/Product/${productId}`);
+        setReviews(res.data);
+
+        const avg =
+          res.data.reduce((sum, r) => sum + r.rating, 0) /
+          (res.data.length || 1);
+
+        setAvgRating(avg);
+      } catch (err) {
+        console.error("Failed to fetch reviews", err);
+      }
+    };
+
+    fetchReviews();
+  }, [productId, API]);
+
+
+  // ⭐ Submit review (ADDED)
+  const submitReview = async () => {
+    if (!userRating) return alert("Please select a rating");
+
+    try {
+      await axios.post(`${API}/api/reviews`, {
+        itemId: productId,
+        itemType: "Product",
+        userName: "Customer",
+        rating: userRating,
+        comment: reviewText,
+      });
+
+      setUserRating(0);
+      setReviewText("");
+
+      const res = await axios.get(`${API}/api/reviews/Product/${productId}`);
+      setReviews(res.data);
+
+      const avg =
+        res.data.reduce((sum, r) => sum + r.rating, 0) /
+        (res.data.length || 1);
+
+      setAvgRating(avg);
+    } catch (err) {
+      console.error("Review submit failed", err);
+    }
+  };
+
+
+
   if (loading) return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -275,7 +336,7 @@ const CakeDetails = () => {
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-6 md:py-10">
         <div className="flex flex-col md:flex-row gap-8 lg:gap-14">
-          
+
           {/* LEFT: Image Section */}
           <div className="w-full md:w-[45%]">
             <div className="sticky top-24">
@@ -303,6 +364,17 @@ const CakeDetails = () => {
             <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight mb-2 tracking-tight uppercase">
               {product.name}
             </h1>
+
+            {/* ⭐ Average Rating (ADDED) */}
+            {reviews.length > 0 && (
+              <div className="flex items-center gap-2 mb-3">
+                <StarRating rating={avgRating} readonly />
+                <span className="text-xs text-gray-500 font-semibold">
+                  {avgRating.toFixed(1)} ({reviews.length} reviews)
+                </span>
+              </div>
+            )}
+
 
             <p className="text-gray-500 text-sm mb-6 leading-relaxed max-w-lg">
               {product.description || "A delicious handcrafted treat made fresh for your special moments."}
@@ -401,6 +473,56 @@ const CakeDetails = () => {
             </div>
           </div>
         </div>
+
+        {/* ⭐ Reviews & Ratings (ADDED — does not affect layout) */}
+        <div className="mt-16 max-w-3xl border-t pt-10">
+          <h2 className="text-lg font-black uppercase tracking-wide mb-3">
+            Customer Reviews
+          </h2>
+
+          <div className="flex items-center gap-3 mb-4">
+            <StarRating rating={avgRating} readonly />
+            <span className="text-sm text-gray-600">
+              {avgRating.toFixed(1)} ({reviews.length} reviews)
+            </span>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-xl mb-6">
+            <h3 className="text-sm font-bold mb-2">Write a Review</h3>
+            <StarRating rating={userRating} setRating={setUserRating} />
+
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="Share your experience..."
+              className="w-full mt-3 p-3 border rounded-xl text-sm"
+            />
+
+            <button
+              onClick={submitReview}
+              className="mt-3 bg-[#f0447c] text-white px-6 py-2 rounded-xl text-xs font-black uppercase"
+            >
+              Submit Review
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {reviews.length === 0 && (
+              <p className="text-gray-500 text-sm">No reviews yet.</p>
+            )}
+
+            {reviews.map((r) => (
+              <div key={r._id} className="border-b pb-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-sm">{r.userName}</span>
+                  <StarRating rating={r.rating} readonly />
+                </div>
+                <p className="text-gray-600 text-sm mt-1">{r.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </main>
 
       <Footer />

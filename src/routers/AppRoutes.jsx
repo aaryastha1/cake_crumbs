@@ -35,10 +35,12 @@ import PaymentSuccess from "../pages/paymentsuccess";
 import PaymentFailed from "../pages/paymentfailure";
 import OrderDetails from "../pages/orderDetailPage";
 import AdminLayout from "../layouts/adminLayout";
-import Services from "../pages/services";
+
+import StarRating from "../components/StarRating";
 
 // Private Admin Route
 import PrivateAdminRoute from "../routers/privateAdminRoutes";
+import PrivacyPolicy from "../pages/Privacy";
 
 export default function AppRoutes() {
   return (
@@ -81,7 +83,8 @@ export default function AppRoutes() {
       <Route path="/preview/:id" element={<CakePreview />} />
       <Route path="/product/:productId" element={<ProductDetailsPage />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
-      <Route path="/services" element={<Services/>}/>
+      <Route path="/privacy" element={<PrivacyPolicy/>}/>
+      <Route path="/reviews" element={<StarRating/>}/>
 
       {/* Home / fallback */}
       <Route path="*" element={<Home />} />

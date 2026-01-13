@@ -27,8 +27,8 @@ const Footer = () => {
             </h3>
             <ul className="space-y-1.5 text-xs text-pink-800/80">
               <li><Link to="/" className="hover:text-pink-600 transition">Home</Link></li>
-              <li><Link to="/services" className="hover:text-pink-600 transition">Services</Link></li>
-              <li><Link to="/about-us" className="hover:text-pink-600 transition">About</Link></li>
+              <li><Link to="/privacy" className="hover:text-pink-600 transition">Privacy Policy</Link></li>
+              <li><Link to="/about-us" className="hover:text-pink-600 transition">About Us</Link></li>
 
             </ul>
           </div>
