@@ -165,13 +165,13 @@ const Register = () => {
             />
 
             {/* OR Separator */}
-            <div className="relative flex justify-center items-center my-3">
+            {/* <div className="relative flex justify-center items-center my-3">
               <div className="flex-grow border-t border-gray-300"></div>
               <span className="flex-shrink mx-2 text-gray-500 text-xs font-medium">
                 OR
               </span>
               <div className="flex-grow border-t border-gray-300"></div>
-            </div>
+            </div> */}
 
             {/* Google Button */}
             {/* <button

@@ -117,13 +117,13 @@ const Login = () => {
               className="rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 placeholder-gray-400"
               style={inputStyle}
             />
-            <div className="relative flex justify-center items-center my-3">
+            {/* <div className="relative flex justify-center items-center my-3">
               <div className="flex-grow border-t border-gray-300"></div>
               <span className="flex-shrink mx-2 text-gray-500 text-xs font-medium">
                 OR
               </span>
               <div className="flex-grow border-t border-gray-300"></div>
-            </div>
+            </div> */}
             {/* <button
               type="button"
               className="w-full rounded-xl flex items-center justify-center transition hover:bg-gray-50"
