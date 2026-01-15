@@ -35,7 +35,7 @@ const Checkout = () => {
 
   const paymentOptions = [
     { id: "ESEWA", label: "E-Sewa" },
-    { id: "PHONEPAY", label: "Phone Pay" },
+    // { id: "PHONEPAY", label: "Phone Pay" },
     { id: "COD", label: "Cash on Delivery" },
   ];
 
@@ -185,11 +185,12 @@ const Checkout = () => {
               <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
                 <input 
   type="date"
-  min={new Date().toISOString().split("T")[0]}
+  min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
   value={deliveryDate}
   onChange={(e) => setDeliveryDate(e.target.value)}
   className="w-full p-2.5 bg-slate-50 border-none rounded-xl font-bold text-slate-700 text-sm outline-none mb-4"
 />
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {timeSlots.map((slot) => (

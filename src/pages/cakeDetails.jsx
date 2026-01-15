@@ -346,9 +346,9 @@ const CakeDetails = () => {
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
-                <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm text-gray-400 hover:text-red-500 transition-all">
+                {/* <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full shadow-sm text-gray-400 hover:text-red-500 transition-all">
                   <Heart size={18} />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -381,7 +381,7 @@ const CakeDetails = () => {
             </p>
 
             <div className="mb-8">
-              <span className="text-3xl font-black text-[#f0447c]">₹{selectedSizeObject.price.toLocaleString()}</span>
+              <span className="text-xl font-black text-[#f0447c]">Rs {selectedSizeObject.price.toLocaleString()}</span>
               <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase">Inclusive of all taxes</p>
             </div>
 

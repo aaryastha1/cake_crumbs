@@ -17,7 +17,7 @@ const Footer = () => {
               Cake and Crumbs
             </h3>
             <p className="text-xs leading-relaxed text-pink-800/70">
-             Crafting sweet memories since 2010. Every bite tells a story of passion, quality, and love.
+              Crafting sweet memories since 2025. Every bite tells a story of passion, quality, and love.
             </p>
           </div>
 
@@ -27,8 +27,19 @@ const Footer = () => {
             </h3>
             <ul className="space-y-1.5 text-xs text-pink-800/80">
               <li><Link to="/" className="hover:text-pink-600 transition">Home</Link></li>
-              <li><Link to="/privacy" className="hover:text-pink-600 transition">Privacy Policy</Link></li>
+
               <li><Link to="/about-us" className="hover:text-pink-600 transition">About Us</Link></li>
+              <li><Link to="/privacy" className="hover:text-pink-600 transition">Privacy Policy</Link></li>
+              <li>
+                <a
+                  href="https://www.youtube.com/watch?v=yYT8oQNea44"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-pink-600 transition"
+                >
+                  Cake & Crumbs Demo
+                </a>
+              </li>
 
             </ul>
           </div>
@@ -66,18 +77,23 @@ const Footer = () => {
             </h3>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://www.facebook.com" // replace with your Facebook URL
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-pink-600 shadow-sm hover:bg-pink-600 hover:text-white transition"
               >
                 <Facebook size={16} />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com" // replace with your Instagram URL
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-pink-600 shadow-sm hover:bg-pink-600 hover:text-white transition"
               >
                 <Instagram size={16} />
               </a>
             </div>
+
           </div>
 
         </div>

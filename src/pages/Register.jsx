@@ -174,7 +174,7 @@ const Register = () => {
             </div>
 
             {/* Google Button */}
-            <button
+            {/* <button
               type="button"
               className="w-full rounded-xl flex items-center justify-center transition hover:bg-gray-50"
               style={googleButtonStyle}
@@ -186,7 +186,7 @@ const Register = () => {
                 className="w-5 h-5 mr-2"
               />
               Sign up with Google
-            </button>
+            </button> */}
 
             {/* Create Account Button */}
             <button

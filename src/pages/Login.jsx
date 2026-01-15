@@ -124,7 +124,7 @@ const Login = () => {
               </span>
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
-            <button
+            {/* <button
               type="button"
               className="w-full rounded-xl flex items-center justify-center transition hover:bg-gray-50"
               style={googleButtonStyle}
@@ -136,7 +136,7 @@ const Login = () => {
                 className="w-5 h-5 mr-2"
               />
               Login with Google
-            </button>
+            </button> */}
             <button
               type="submit"
               disabled={loading}
