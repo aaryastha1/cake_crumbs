@@ -11,7 +11,7 @@ export const state = proxy({
     sparkle: '#FFD700',
     flower: '#ffb7c5', // Default cherry blossom pink
   },
-  frostingType: 'smooth',
+  frostingType: 'none',
   extraItem: 'none', // none, cherries, chocolate, berries, flowers
   showSparkles: false,
   logoTexture: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 

@@ -120,20 +120,7 @@ const BakeryProducts = () => {
               key={item._id}
               className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-transparent hover:border-rose-50 transition-all relative"
             >
-              {/* FAVORITE BUTTON */}
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(item._id);
-                }}
-                className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-md p-2 rounded-full shadow-sm hover:scale-110 transition-all"
-              >
-                <Heart 
-                  size={16} 
-                  fill={isFavorited(item._id) ? "#E24C63" : "none"} 
-                  className={isFavorited(item._id) ? "text-[#E24C63]" : "text-gray-400"}
-                />
-              </button>
+            
 
               <div onClick={() => { setSelectedProduct(item); setQuantity(1); }} className="cursor-pointer">
                 <div className="relative aspect-[5/4] overflow-hidden">

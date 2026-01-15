@@ -71,14 +71,20 @@ export default function AdminProducts() {
                 </div>
 
                 {/* Sizes */}
-                <div className="text-sm mb-2 space-y-1">
-                  {p.sizes.map((s, i) => (
-                    <div key={i} className="flex justify-between border-b border-gray-100 pb-1 last:border-b-0">
-                      <span className="text-gray-600">{s.size}</span>
-                      <span className="font-bold text-[#d87f7f]">₹{s.price}</span>
-                    </div>
-                  ))}
-                </div>
+<div className="text-sm mb-2 space-y-1">
+  {p.sizes.map((s, i) => (
+    <div
+      key={i}
+      className="flex justify-between border-b border-gray-100 pb-1 last:border-b-0"
+    >
+      <span className="text-gray-600">{s.size}</span>
+      <span className="font-bold text-[#d87f7f]">
+        ₹{Math.max(0, Number(s.price))}
+      </span>
+    </div>
+  ))}
+</div>
+
 
                 {/* Action Buttons */}
                 <div className="flex justify-between mt-4 gap-2">

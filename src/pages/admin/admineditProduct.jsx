@@ -104,12 +104,18 @@ export default function EditProduct() {
                 onChange={e => { const copy = [...sizes]; copy[i].size = e.target.value; setSizes(copy); }}
               />
               <input
-                placeholder="Price"
-                type="number"
-                className="border p-2 w-1/2 rounded focus:ring-2 focus:ring-purple-200"
-                value={s.price}
-                onChange={e => { const copy = [...sizes]; copy[i].price = e.target.value; setSizes(copy); }}
-              />
+  type="number"
+  min="0"
+  placeholder="Price"
+  className="border p-2 w-1/2 rounded focus:ring-2 focus:ring-purple-200"
+  value={s.price}
+  onChange={e => {
+    const copy = [...sizes];
+    copy[i].price = Math.max(0, Number(e.target.value));
+    setSizes(copy);
+  }}
+/>
+
               {sizes.length > 1 && <button type="button" onClick={() => removeSize(i)} className="text-red-500 font-bold">×</button>}
             </div>
           ))}

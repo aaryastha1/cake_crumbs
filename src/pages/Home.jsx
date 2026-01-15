@@ -48,7 +48,7 @@ export default function Home() {
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0)
-  ; // For hero carousel
+    ; // For hero carousel
 
   useEffect(() => {
     fetch("http://localhost:5006/api/home")
@@ -110,11 +110,10 @@ export default function Home() {
                   <button
                     key={index}
                     onClick={() => handleSlideClick(index)}
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      currentSlide === index
+                    className={`w-2.5 h-2.5 rounded-full ${currentSlide === index
                         ? "bg-pink-500"
                         : "bg-gray-300 hover:bg-pink-300"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -130,12 +129,13 @@ export default function Home() {
                 Perfect for birthdays, get-togethers, or simply moments delivered fresh across Kathmandu.
               </p>
               <button
-  onClick={() => navigate("/occasions/all")} // Go to Occasions page and select "All"
-  className="text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-[1.03]"
-  style={{ background: primaryPink }}
->
-  Order Now
-</button>
+                onClick={() => navigate("/occasions/all")} // Go to Occasions page and select "All"
+                
+                className="text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-[1.03]"
+                style={{ background:  "#d84e6d" }}
+              >
+                Order Now
+              </button>
 
 
             </div>
@@ -169,39 +169,49 @@ export default function Home() {
             </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {bestSellers.slice(0, 4).map((item, index) => (
-                <div
-                  key={index}
-                  className="group cursor-pointer p-3"
-                  style={bestSellerCardStyle}
-                >
-                  <div className="w-full aspect-square overflow-hidden rounded-xl mb-3 bg-white flex items-center justify-center">
-                    <img
-                      src={`http://localhost:5006${item.imageUrl}`}
-                      alt={item.name}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <p
-                    className="text-base font-semibold mt-2"
-                    style={{ color: secondaryPink }}
-                  >
-                    {item.name}
-                  </p>
-                </div>
-              ))}
-            </div>
+  {bestSellers.slice(0, 4).map((item, index) => {
+    // Determine where to navigate
+    let navigateTo = "/occasions/all"; // default fallback
 
-            {/* <button
-              className="mt-12 text-sm font-semibold px-6 py-2 rounded-full transition-colors"
-              style={{
-                backgroundColor: "#FFFFFF",
-                border: `1px solid ${primaryPink}`,
-                color: primaryPink,
-              }}
-            >
-              See More
-            </button> */}
+    const nameLower = item.name.toLowerCase();
+
+    if (nameLower.includes("tiramisu")) {
+      navigateTo = "/bakeries";
+    } else if (nameLower.includes("chocolate cookies")) {
+      navigateTo = "/bakeries";
+    } else if (nameLower.includes("white forest") || nameLower.includes("raspberry")) {
+      navigateTo = "/occasions/all";
+    }
+
+    return (
+      <div
+        key={index}
+        className="group cursor-pointer p-3"
+        style={bestSellerCardStyle}
+        onClick={() => navigate(navigateTo)} // navigate on click
+      >
+        <div className="w-full aspect-square overflow-hidden rounded-xl mb-3 bg-white flex items-center justify-center">
+          <img
+            src={`http://localhost:5006${item.imageUrl}`}
+            alt={item.name}
+            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+        <p
+          className="text-base font-semibold mt-2"
+          style={{ color: secondaryPink }}
+        >
+          {item.name}
+        </p>
+      </div>
+    );
+  })}
+</div>
+
+
+
+
+           
           </div>
         </section>
 
@@ -211,7 +221,7 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-[50%] h-full bg-[#F7E7EB] rounded-l-[100px] -z-0"></div>
 
           <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center justify-between relative z-10">
-            
+
             {/* LEFT COLUMN: ELEGANT TEXT */}
             <div className="lg:w-[45%] mb-16 lg:mb-0 text-left">
               <h2
@@ -236,14 +246,14 @@ export default function Home() {
                   fontWeight: "400", // Bold
                 }}
               >
-                Your celebration deserves a centerpiece as unique as your story. 
-                Each cake is a handcrafted masterpiece, designed in our 3D studio 
+                Your celebration deserves a centerpiece as unique as your story.
+                Each cake is a handcrafted masterpiece, designed in our 3D studio
                 with delicate pearls, silk ribbons, and artistic floral arrangements.
               </p>
 
               <button
                 onClick={() => navigate("/customize-cake")} // Action: Navigate to customize-cake
-                className="group bg-[#2D3E50] text-white font-bold py-4 px-12 rounded-xl shadow-2xl transition-all hover:bg-pink-500 hover:scale-105 active:scale-95 flex items-center gap-4"
+                className="group bg-[#d84e6d] text-white font-bold py-4 px-12 rounded-xl shadow-2xl transition-all hover:bg-pink-400 hover:scale-105 active:scale-95 flex items-center gap-4"
               >
                 <span className="uppercase tracking-widest text-[11px]">Start Designing</span>
                 <div className="w-6 h-[1px] bg-white/50 group-hover:w-10 transition-all"></div>
@@ -253,27 +263,27 @@ export default function Home() {
             {/* RIGHT COLUMN: THE STUDIO PHOTO WITH DEEP CURVES */}
             <div className="lg:w-[50%] flex justify-center lg:justify-end">
               <div className="relative group">
-                
+
                 {/* Image container */}
                 <div className="relative z-10 p-4 bg-white rounded-[60px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] transition-transform duration-1000 ease-out group-hover:scale-[1.02]">
                   <img
                     src={`http://localhost:5006${customSection.image}`}
                     alt="Custom 3D Cake Design"
                     className="w-full max-w-lg rounded-[50px] object-cover aspect-[4/5]"
-                    style={{ 
-                        border: "1px solid rgba(0,0,0,0.05)"
+                    style={{
+                      border: "1px solid rgba(0,0,0,0.05)"
                     }}
                   />
-                  
+
                   {/* Subtle "Studio Information" Overlay */}
                   <div className="absolute bottom-10 left-10 right-10 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                     <div className="bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/30 text-[#2D3E50]">
-                        <p className="text-[8px] uppercase font-black tracking-widest opacity-70">Texture</p>
-                        <p className="text-xs font-bold">Silk Buttercream</p>
-                     </div>
-                     <div className="bg-white p-3 rounded-2xl shadow-lg">
-                        <p className="text-[10px] font-black text-pink-500 uppercase">360° View</p>
-                     </div>
+                    <div className="bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/30 text-[#2D3E50]">
+                      <p className="text-[8px] uppercase font-black tracking-widest opacity-70">Texture</p>
+                      <p className="text-xs font-bold">Silk Buttercream</p>
+                    </div>
+                    <div className="bg-white p-3 rounded-2xl shadow-lg">
+                      <p className="text-[10px] font-black text-pink-500 uppercase">360° View</p>
+                    </div>
                   </div>
                 </div>
 

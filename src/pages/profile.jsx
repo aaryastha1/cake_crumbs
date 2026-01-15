@@ -176,7 +176,7 @@ const Profile = () => {
                                                     <p className="text-[10px] font-bold text-[#E24C63] mt-1">Status: {order.status}</p>
                                                     <p className="text-[10px] font-bold text-gray-700 mt-1">Total: Rs {order.total || order.totalAmount}</p>
                                                 </div>
-                                                <button onClick={() => navigate(`/orders/${order._id}`)} className="text-xs font-bold text-[#E24C63] underline">
+                                                <button onClick={() => navigate(`/order-details/${order._id}`)} className="text-xs font-bold text-[#E24C63] underline">
                                                     View Details
                                                 </button>
                                             </div>

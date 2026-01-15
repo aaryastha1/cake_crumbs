@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, MapPin, CreditCard } from "lucide-react";
+import { ChevronLeft, MapPin, CreditCard, ImageOff } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -15,7 +15,9 @@ const OrderDetails = () => {
 
   useEffect(() => {
     const fetchOrder = async () => {
-      const token = localStorage.getItem("token"); // make sure user is logged in
+      const token = localStorage.getItem("token");
+      if (!token) return navigate("/login");
+
       try {
         const res = await axios.get(`${API}/api/orders/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -27,34 +29,37 @@ const OrderDetails = () => {
         setLoading(false);
       }
     };
-    fetchOrder();
-  }, [id, API]);
 
-  if (loading)
+    fetchOrder();
+  }, [id, API, navigate]);
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-400 font-bold bg-[#FAF7F6]">
         Loading...
       </div>
     );
+  }
 
-  if (!order)
+  if (!order) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-400 font-bold bg-[#FAF7F6]">
         Order not found
       </div>
     );
+  }
 
   return (
     <div className="bg-[#FAF7F6] min-h-screen font-sans text-[#2D3E50]">
       <Header />
 
-      <div className="max-w-[800px] mx-auto p-6 py-12">
+      <div className="max-w-[800px] mx-auto px-6 py-12">
         {/* Back Button */}
         <button
-          onClick={() => navigate("/orders")}
-          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8 hover:text-[#E24C63]"
+          onClick={() => navigate("/profile")}
+          className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-6 hover:text-[#E24C63] transition"
         >
-          <ChevronLeft size={14} /> Back to Orders
+          <ChevronLeft size={12} /> Back
         </button>
 
         <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-rose-50/50">
@@ -81,7 +86,7 @@ const OrderDetails = () => {
           {/* Ordered Items */}
           <div className="mb-12">
             <h2 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">
-              View Details
+              Items
             </h2>
 
             <div className="space-y-4">
@@ -90,14 +95,25 @@ const OrderDetails = () => {
                   key={index}
                   className="flex gap-4 bg-[#FAF7F6] p-4 rounded-2xl items-center"
                 >
-                  {item.image && (
+                  {/* Image */}
+                  {item.image ? (
                     <img
-                      src={item.image}
+                      src={
+                        item.image.startsWith("http")
+                          ? item.image
+                          : `${API}${item.image}`
+                      }
                       alt={item.name}
-                      className="w-20 h-20 rounded-xl object-cover"
+                      className="w-16 h-16 rounded-xl object-cover"
+                      onError={(e) => (e.target.style.display = "none")}
                     />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl bg-gray-200 flex items-center justify-center">
+                      <ImageOff size={20} className="text-gray-400" />
+                    </div>
                   )}
 
+                  {/* Details */}
                   <div className="flex-1">
                     <p className="text-sm font-bold">{item.name}</p>
                     {item.flavor && (
@@ -111,12 +127,18 @@ const OrderDetails = () => {
                       </p>
                     )}
                     {item.note && (
-                      <p className="text-[11px] text-gray-500 italic">Note: {item.note}</p>
+                      <p className="text-[11px] text-gray-500 italic">
+                        Note: {item.note}
+                      </p>
                     )}
-                    <p className="text-[11px] text-gray-500">Qty: {item.quantity}</p>
+                    <p className="text-[11px] text-gray-500">
+                      Qty: {item.quantity}
+                    </p>
                   </div>
 
-                  <p className="font-bold text-sm">Rs {item.price * item.quantity}</p>
+                  <p className="font-bold text-sm">
+                    Rs {item.price * item.quantity}
+                  </p>
                 </div>
               ))}
             </div>
@@ -124,8 +146,8 @@ const OrderDetails = () => {
 
           {/* Shipping & Payment */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
-            <div className="space-y-4">
-              <h3 className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+            <div>
+              <h3 className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">
                 <MapPin size={14} /> Shipping
               </h3>
               <div className="bg-[#FAF7F6] p-5 rounded-2xl text-xs font-bold text-gray-500">
@@ -137,13 +159,15 @@ const OrderDetails = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+            <div>
+              <h3 className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">
                 <CreditCard size={14} /> Payment
               </h3>
               <div
                 className={`bg-[#FAF7F6] p-5 rounded-2xl text-xs font-bold ${
-                  order.paymentStatus === "PAID" ? "text-green-600" : "text-red-600"
+                  order.paymentStatus === "PAID"
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
                 {order.paymentMethod} — {order.paymentStatus}
@@ -152,12 +176,14 @@ const OrderDetails = () => {
           </div>
 
           {/* Total */}
-          <div className="bg-slate-900 rounded-[24px] p-8 text-white flex justify-between items-center">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Total Amount
-            </p>
-            <p className="text-3xl font-black">Rs {order.total}</p>
-          </div>
+         <div className="bg-slate-800 rounded-[18px] px-5 py-3 text-white flex justify-between items-center">
+  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+    Total Amount
+  </p>
+  <p className="text-sm font-black">Rs {order.total}</p>
+</div>
+
+
         </div>
       </div>
 

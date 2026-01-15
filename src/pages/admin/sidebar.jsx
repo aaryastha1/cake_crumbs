@@ -1,24 +1,32 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaTachometerAlt, FaBoxOpen, FaClipboardList, FaUsers, FaCookieBite, FaSignOutAlt } from 'react-icons/fa';
+import { useContext } from "react";
+import { AuthContext } from "../../auth/AuthContext";
+
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
 
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: FaTachometerAlt },
     { name: "Products", path: "/admin/products", icon: FaBoxOpen },
     { name: "Categories", path: "/admin/categories", icon: FaClipboardList },
     { name: "Orders", path: "/admin/orders", icon: FaUsers },
-    { name: "Customers", path: "/admin/customers", icon: FaCookieBite },
     { name: "Bakeries", path: "/admin/bakery", icon: FaBoxOpen }
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login"); 
-  };
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
+    logout();
+    navigate("/login");
+  }
+};
+
+
 
   return (
     <div className="w-64 bg-[#5f3e4f] min-h-screen flex flex-col text-white">
@@ -69,7 +77,7 @@ const Sidebar = () => {
             </div>
             <div className="overflow-hidden">
                 <p className="font-bold text-sm truncate">Admin User</p>
-                <p className="text-[10px] text-gray-400 truncate tracking-wide">admin@sweetdelights.com</p>
+                <p className="text-[10px] text-gray-400 truncate tracking-wide">admin@cakeandcrumbs.com</p>
             </div>
         </div>
       </div>

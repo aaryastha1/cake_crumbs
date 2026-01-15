@@ -35,6 +35,7 @@ import PaymentSuccess from "../pages/paymentsuccess";
 import PaymentFailed from "../pages/paymentfailure";
 import OrderDetails from "../pages/orderDetailPage";
 import AdminLayout from "../layouts/adminLayout";
+import OrdersPage from "../pages/orderPage";
 
 import StarRating from "../components/StarRating";
 
@@ -83,6 +84,7 @@ export default function AppRoutes() {
       <Route path="/preview/:id" element={<CakePreview />} />
       <Route path="/product/:productId" element={<ProductDetailsPage />} />
       <Route path="/order-details/:id" element={<OrderDetails />} />
+      <Route path="/order" element={<OrdersPage/>}/>
       <Route path="/privacy" element={<PrivacyPolicy/>}/>
       <Route path="/reviews" element={<StarRating/>}/>
 

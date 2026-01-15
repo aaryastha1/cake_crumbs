@@ -27,12 +27,12 @@ const PaymentSuccess = () => {
             Your order has been confirmed and is being processed.
           </p>
           <div className="space-y-3">
-            <button 
+            {/* <button 
               onClick={() => navigate('/profile', { state: { activeTab: "Orders" } })} 
               className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-800 flex items-center justify-center gap-2"
             >
               <ShoppingBag size={16} /> View My Orders
-            </button>
+            </button> */}
             <button 
               onClick={() => navigate('/')} 
               className="w-full text-slate-400 py-4 font-bold uppercase text-[10px]"
